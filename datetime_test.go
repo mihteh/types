@@ -95,3 +95,21 @@ func TestNeverTime(t *testing.T) {
 		t.Fatalf("Ожидалось получить строку %s, получена строка %s", sExpected, sReceived)
 	}
 }
+
+/*
+	Проверяет возврат текущих даты, даты-времени и
+	преобразование Date -> DateTime с учётом HMS
+*/
+func TestNow(t *testing.T) {
+	dateTimeNow := DateTimeNow()
+	dateNow := dateTimeNow.ConvertToDate()
+	dateTimeAfterConversion := dateNow.ConvertToDateTimeHMS(
+		dateTimeNow.Hour(), dateTimeNow.Minute(), dateTimeNow.Second())
+	dateTimeAfterConversion.Layout = DateTimeLayout
+
+	sExpected := dateTimeNow.String()
+	sReceived := dateTimeAfterConversion.String()
+	if sExpected != sReceived {
+		t.Fatalf("Ожидалось получить строку %s, получена строка %s", sExpected, sReceived)
+	}
+}
