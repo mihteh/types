@@ -26,6 +26,18 @@ func TestDateTimeStringConversion(t *testing.T) {
 	}
 }
 
+func TestBadStringToDateTime(t *testing.T) {
+	if _, err := StringToDateTime("wrong"); err == nil {
+		t.Fatal("Ожидалась ошибка")
+	}
+}
+
+func TestBadStringToDateTimeHMS(t *testing.T) {
+	if _, err := StringDateToDateTimeHMS("wrong", 23, 59, 59); err == nil {
+		t.Fatal("Ожидалась ошибка")
+	}
+}
+
 /*
 	Проверяет функции ToDate(), String() и StringToDate()
 */
@@ -42,6 +54,12 @@ func TestDateStringConversion(t *testing.T) {
 	expectedString := dateFromString.String()
 	if expectedString != dateString {
 		t.Fatalf("Ошибка %v. Ожидалось %v, получено %v", err, expectedString, dateString)
+	}
+}
+
+func TestBadStringToDate(t *testing.T) {
+	if _, err := StringToDate("wrong"); err == nil {
+		t.Fatal("Ожидалась ошибка")
 	}
 }
 
