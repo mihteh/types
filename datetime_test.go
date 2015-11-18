@@ -288,3 +288,77 @@ func TestDateUnmarshalBadJSON(t *testing.T) {
 		t.Fatal("Ожидалась ошибка")
 	}
 }
+
+func TestDateTimeScanValueForDB(t *testing.T) {
+	dt := DateTimeNow()
+	v, err := dt.Value()
+	if err != nil {
+		t.Fatal(err)
+	}
+	vString, ok := v.(string)
+	if !ok {
+		t.Fatal("Ошибка преобразования интерфейса")
+	}
+	vdt, err := StringToDateTime(vString)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var dtFromScan DateTime
+	if err := dtFromScan.Scan(vdt.Time); err != nil {
+		t.Fatal(err)
+	}
+	sExpected := dt.String()
+	sReceived := dtFromScan.String()
+	if sExpected != sReceived {
+		t.Fatalf("Ожидалось получить строку %s, получена строка %s", sExpected, sReceived)
+	}
+}
+
+func TestDateTimeScanIfBadValue(t *testing.T) {
+	var dtFromScan DateTime
+
+	if err := dtFromScan.Scan(nil); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := dtFromScan.Scan("wrong"); err == nil {
+		t.Fatal("Ожидалась ошибка")
+	}
+}
+
+func TestDateScanValueForDB(t *testing.T) {
+	d := DateNow()
+	v, err := d.Value()
+	if err != nil {
+		t.Fatal(err)
+	}
+	vString, ok := v.(string)
+	if !ok {
+		t.Fatal("Ошибка преобразования интерфейса")
+	}
+	vd, err := StringToDate(vString)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var dFromScan Date
+	if err := dFromScan.Scan(vd.Time); err != nil {
+		t.Fatal(err)
+	}
+	sExpected := d.String()
+	sReceived := dFromScan.String()
+	if sExpected != sReceived {
+		t.Fatalf("Ожидалось получить строку %s, получена строка %s", sExpected, sReceived)
+	}
+}
+
+func TestDateScanIfBadValue(t *testing.T) {
+	var dFromScan Date
+
+	if err := dFromScan.Scan(nil); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := dFromScan.Scan("wrong"); err == nil {
+		t.Fatal("Ожидалась ошибка")
+	}
+}
