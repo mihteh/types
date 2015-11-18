@@ -42,3 +42,25 @@ func TestDateStringConversion(t *testing.T) {
 		t.Fatalf("Ошибка %v. Ожидалось %v, получено %v", err, expectedString, dateString)
 	}
 }
+
+func TestDaysBefore(t *testing.T) {
+	dateToday := DateNow()
+	dateYesterday := ToDate(time.Now().AddDate(0, 0, -1))
+	dateTomorrow := ToDate(time.Now().AddDate(0, 0, 1))
+
+	if d := dateToday.DaysBefore(dateToday); d != 0 {
+		t.Fatalf("Ожидалось 0, получено %d дней", d)
+	}
+
+	if d := dateToday.DaysBefore(dateYesterday); d != -1 {
+		t.Fatalf("Ожидалось -1, получено %d дней", d)
+	}
+
+	if d := dateToday.DaysBefore(dateTomorrow); d != 1 {
+		t.Fatalf("Ожидалось 1, получено %d дней", d)
+	}
+
+	if d := dateYesterday.DaysBefore(dateTomorrow); d != 2 {
+		t.Fatalf("Ожидалось 2, получено %d дней", d)
+	}
+}
