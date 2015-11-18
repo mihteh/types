@@ -77,3 +77,21 @@ func TestStringToDateTimeHMS(t *testing.T) {
 		t.Fatalf("Ожидалось получить строку %s, получена строка %s", sExpected, sReceived)
 	}
 }
+
+func TestNeverDate(t *testing.T) {
+	nd := NeverDate()
+	sExpected := "1990-01-01"
+	sReceived := nd.String()
+	if sExpected != sReceived {
+		t.Fatalf("Ожидалось получить строку %s, получена строка %s", sExpected, sReceived)
+	}
+}
+
+func TestNeverTime(t *testing.T) {
+	ndt := NeverTime()
+	sExpected := "1990-01-01 00:00:00"
+	sReceived := ndt.String()
+	if sExpected != sReceived {
+		t.Fatalf("Ожидалось получить строку %s, получена строка %s", sExpected, sReceived)
+	}
+}
