@@ -140,3 +140,42 @@ func TestDateTimeSetDefaultLayoutIfEmpty(t *testing.T) {
 		t.Fatal("Установлен неправильный Layout")
 	}
 }
+
+func TestDateBeforeAfterBetween(t *testing.T) {
+	dateToday := DateNow()
+	dateYesterday := ToDate(time.Now().AddDate(0, 0, -1))
+	dateTomorrow := ToDate(time.Now().AddDate(0, 0, 1))
+
+	if dateToday.Before(dateToday) {
+		t.Fatal("Сегодня не может быть раньше чем сегодня")
+	}
+	if dateToday.After(dateToday) {
+		t.Fatal("Сегодня не может быть позже чем сегодня")
+	}
+	if dateToday.Between(dateToday, dateTomorrow) {
+		t.Fatal("Сегодня не может быть между сегодня и завтра")
+	}
+	if dateToday.Between(dateYesterday, dateToday) {
+		t.Fatal("Сегодня не может быть между вчера и сегодня")
+	}
+
+	if dateToday.Before(dateYesterday) {
+		t.Fatal("Сегодня не может быть раньше чем вчера")
+	}
+	if dateYesterday.After(dateToday) {
+		t.Fatal("Вчера не может быть позже чем сегодня")
+	}
+	if dateYesterday.Between(dateToday, dateTomorrow) {
+		t.Fatal("Вчера не может быть между сегодня и завтра")
+	}
+
+	if !dateToday.Before(dateTomorrow) {
+		t.Fatal("Сегодня должно быть раньше чем завтра")
+	}
+	if !dateToday.After(dateYesterday) {
+		t.Fatal("Сегодня должно быть позже чем вчера")
+	}
+	if !dateToday.Between(dateYesterday, dateTomorrow) {
+		t.Fatal("Сегодня должно быть между вчера и завтра")
+	}
+}
