@@ -113,3 +113,12 @@ func TestNow(t *testing.T) {
 		t.Fatalf("Ожидалось получить строку %s, получена строка %s", sExpected, sReceived)
 	}
 }
+
+func TestDateTimeTodayHMS(t *testing.T) {
+	dt := DateTimeTodayHMS(23, 59, 59)
+	sExpected := DateNow().String() + " 23:59:59"
+	sReceived := dt.String()
+	if sExpected != sReceived {
+		t.Fatalf("Ожидалось получить строку %s, получена строка %s", sExpected, sReceived)
+	}
+}
