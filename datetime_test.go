@@ -179,3 +179,42 @@ func TestDateBeforeAfterBetween(t *testing.T) {
 		t.Fatal("Сегодня должно быть между вчера и завтра")
 	}
 }
+
+func TestDateTimeBeforeAfterBetween(t *testing.T) {
+	dateNow := DateTimeNow()
+	dateMinBefore := ToDateTime(time.Now().Add(-time.Minute))
+	dateMinAfter := ToDateTime(time.Now().Add(time.Minute))
+
+	if dateNow.Before(dateNow) {
+		t.Fatal("Сейчас не может быть раньше чем сейчас")
+	}
+	if dateNow.After(dateNow) {
+		t.Fatal("Сейчас не может быть позже чем сейчас")
+	}
+	if dateNow.Between(dateNow, dateMinAfter) {
+		t.Fatal("Сейчас не может быть между сейчас и через минуту")
+	}
+	if dateNow.Between(dateMinBefore, dateNow) {
+		t.Fatal("Сейчас не может быть между минуту назад и сейчас")
+	}
+
+	if dateNow.Before(dateMinBefore) {
+		t.Fatal("Сейчас не может быть раньше чем минуту назад")
+	}
+	if dateMinBefore.After(dateNow) {
+		t.Fatal("Минуту назад не может быть позже чем сейчас")
+	}
+	if dateMinBefore.Between(dateNow, dateMinAfter) {
+		t.Fatal("Минуту назад не может быть между сейчас и через минуту")
+	}
+
+	if !dateNow.Before(dateMinAfter) {
+		t.Fatal("Сейчас должно быть раньше чем через минуту")
+	}
+	if !dateNow.After(dateMinBefore) {
+		t.Fatal("Сейчас должно быть позже чем минуту назад")
+	}
+	if !dateNow.Between(dateMinBefore, dateMinAfter) {
+		t.Fatal("Сейчас должно быть между минуту назад и через минуту")
+	}
+}
