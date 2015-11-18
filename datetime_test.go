@@ -1,6 +1,8 @@
 package types
 
 import (
+	"encoding/json"
+	"fmt"
 	"testing"
 	"time"
 )
@@ -216,5 +218,73 @@ func TestDateTimeBeforeAfterBetween(t *testing.T) {
 	}
 	if !dateNow.Between(dateMinBefore, dateMinAfter) {
 		t.Fatal("Сейчас должно быть между минуту назад и через минуту")
+	}
+}
+
+func TestDateTimeJSON(t *testing.T) {
+	dtString := "2015-07-30 20:58:59"
+	jsonExpected := fmt.Sprintf(`"%s"`, dtString)
+	dt, err := StringToDateTime(dtString)
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, err := json.Marshal(dt)
+	if err != nil {
+		t.Fatal(err)
+	}
+	jsonReceived := string(b)
+	if jsonExpected != jsonReceived {
+		t.Fatalf("Ошибка Marshal. Ожидалось получить JSON %s, получен JSON %s", jsonExpected, jsonReceived)
+	}
+
+	var dtFromJson DateTime
+	if err := json.Unmarshal(b, &dtFromJson); err != nil {
+		t.Fatal(err)
+	}
+	dtFromJsonString := dtFromJson.String()
+	if dtFromJsonString != dtString {
+		t.Fatalf("Ошибка Unmarshal. Ожидалось получить JSON %s, получен JSON %s", dtString, dtFromJsonString)
+	}
+}
+
+func TestDateTimeUnmarshalBadJSON(t *testing.T) {
+	b := []byte(`"wrong"`)
+	var dtFromJson DateTime
+	if err := json.Unmarshal(b, &dtFromJson); err == nil {
+		t.Fatal("Ожидалась ошибка")
+	}
+}
+
+func TestDateJSON(t *testing.T) {
+	dString := "2015-07-30"
+	jsonExpected := fmt.Sprintf(`"%s"`, dString)
+	d, err := StringToDate(dString)
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, err := json.Marshal(d)
+	if err != nil {
+		t.Fatal(err)
+	}
+	jsonReceived := string(b)
+	if jsonExpected != jsonReceived {
+		t.Fatalf("Ошибка Marshal. Ожидалось получить JSON %s, получен JSON %s", jsonExpected, jsonReceived)
+	}
+
+	var dFromJson Date
+	if err := json.Unmarshal(b, &dFromJson); err != nil {
+		t.Fatal(err)
+	}
+	dFromJsonString := dFromJson.String()
+	if dFromJsonString != dString {
+		t.Fatalf("Ошибка Unmarshal. Ожидалось получить JSON %s, получен JSON %s", dString, dFromJsonString)
+	}
+}
+
+func TestDateUnmarshalBadJSON(t *testing.T) {
+	b := []byte(`"wrong"`)
+	var dFromJson Date
+	if err := json.Unmarshal(b, &dFromJson); err == nil {
+		t.Fatal("Ожидалась ошибка")
 	}
 }
