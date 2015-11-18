@@ -10,16 +10,25 @@ import (
 	"time"
 )
 
+/*
+	Тип для хранения даты-времени
+*/
 type DateTime struct {
 	time.Time
 	Layout string
 }
 
+/*
+	Тип для хранения даты
+*/
 type Date struct {
 	time.Time
 	Layout string
 }
 
+/*
+	Шаблоны вывода
+*/
 const (
 	DateTimeLayout        = "2006-01-02 15:04:05"
 	DateLayout            = "2006-01-02"
@@ -29,6 +38,9 @@ const (
 
 var defaultLocation *time.Location
 
+/*
+	Задаёт часовой пояс по умолчанию
+*/
 func init() {
 	var err error
 	defaultLocation, err = time.LoadLocation("Europe/Moscow")
@@ -62,6 +74,9 @@ func (a Date) DaysBefore(b Date) int {
 	return int(b.Time.Sub(a.Time).Hours() / 24)
 }
 
+/*
+	Преобразует строку по стандартному шаблону даты-времени в дату-время
+*/
 func StringToDateTime(s string) (DateTime, error) {
 	t, err := time.ParseInLocation(DateTimeLayout, s, defaultLocation)
 	if err != nil {
@@ -70,6 +85,10 @@ func StringToDateTime(s string) (DateTime, error) {
 	return ToDateTime(t), nil
 }
 
+/*
+	Преобразует строку по стандартному шаблону даты в дату-время с заданным значением
+	часов, минут и секунд
+*/
 func StringDateToDateTimeHMS(s string, hours int, mins int, secs int) (DateTime, error) {
 	t, err := time.ParseInLocation(DateLayout, s, defaultLocation)
 	if err != nil {
@@ -80,6 +99,9 @@ func StringDateToDateTimeHMS(s string, hours int, mins int, secs int) (DateTime,
 	return d, nil
 }
 
+/*
+	Преобразует строку по стандартному шаблону даты в дату
+*/
 func StringToDate(s string) (Date, error) {
 	t, err := time.ParseInLocation(DateLayout, s, defaultLocation)
 	if err != nil {
@@ -88,6 +110,9 @@ func StringToDate(s string) (Date, error) {
 	return ToDate(t), nil
 }
 
+/*
+	Возвращает дату в далёком прошлом
+*/
 func NeverDate() Date {
 	t, _ := time.ParseInLocation(DateLayout, "1990-01-01", defaultLocation)
 	return ToDate(t)
@@ -116,24 +141,35 @@ func DateTimeTodayHMS(hours int, mins int, secs int) DateTime {
 	return d.SetHMS(hours, mins, secs)
 }
 
+/*
+	Возвращает дату-время в далёком прошлом
+*/
 func NeverTime() DateTime {
 	t, _ := time.ParseInLocation(DateTimeLayout, "1990-01-01 00:00:00", defaultLocation)
 	return ToDateTime(t)
 }
 
+/*
+	Устанавливает шаблон вывода даты-времени по умолчанию, если шаблон не установлен
+*/
 func (obj *DateTime) setDefaultLayoutIfEmpty() {
 	if strings.TrimSpace(obj.Layout) == "" {
 		obj.Layout = DateTimeLayout
 	}
 }
 
+/*
+	Устанавливает шаблон вывода даты по умолчанию, если шаблон не установлен
+*/
 func (obj *Date) setDefaultLayoutIfEmpty() {
 	if strings.TrimSpace(obj.Layout) == "" {
 		obj.Layout = DateLayout
 	}
 }
 
-// устанавливает часы, минуты, секунды в объекте типа DateTime
+/*
+	Устанавливает значения часов, минут и секунд
+*/
 func (obj DateTime) SetHMS(hours int, mins int, secs int) DateTime {
 	t := obj.Time
 	dS := fmt.Sprintf("%s %02d:%02d:%02d", t.Format(DateLayout), hours, mins, secs)
@@ -142,12 +178,18 @@ func (obj DateTime) SetHMS(hours int, mins int, secs int) DateTime {
 	return obj
 }
 
+/*
+	Преобразует дату-время в дату
+*/
 func (obj DateTime) ConvertToDate() Date {
 	dS := obj.Time.Format(DateLayout)
 	t, _ := time.ParseInLocation(DateLayout, dS, defaultLocation)
 	return ToDate(t)
 }
 
+/*
+	Преобразует дату в дату-время с заданными значениями часов, минут и секунд
+*/
 func (obj Date) ConvertToDateTimeHMS(hours int, mins int, secs int) DateTime {
 	d := DateTime{
 		Time:   obj.Time,
@@ -158,30 +200,55 @@ func (obj Date) ConvertToDateTimeHMS(hours int, mins int, secs int) DateTime {
 	return d
 }
 
+/*
+	Возвращает true если дата obj позднее d, иначе false
+	Сравнение с точностью до дня.
+*/
 func (obj Date) After(d Date) bool {
 	return obj.Time.After(d.Time)
 }
 
+/*
+	Возвращает true если дата obj ранее d, иначе false
+	Сравнение с точностью до дня.
+*/
 func (obj Date) Before(d Date) bool {
 	return obj.Time.Before(d.Time)
 }
 
+/*
+	Возвращает true если дата obj находится в интервале дат (d1; d2), иначе false
+	Сравнение с точностью до дня.
+*/
 func (obj Date) Between(d1, d2 Date) bool {
 	return obj.After(d1) && obj.Before(d2)
 }
 
+/*
+	Возвращает true если дата-время obj позднее d, иначе false
+*/
 func (obj DateTime) After(d DateTime) bool {
 	return obj.Time.After(d.Time)
 }
 
+/*
+	Возвращает true если дата-время obj ранее d, иначе false
+*/
 func (obj DateTime) Before(d DateTime) bool {
 	return obj.Time.Before(d.Time)
 }
 
+/*
+	Возвращает true если дата-время obj находится в интервале
+	даты-времени (d1; d2), иначе false
+*/
 func (obj DateTime) Between(d1, d2 DateTime) bool {
 	return obj.After(d1) && obj.Before(d2)
 }
 
+/*
+	Правило преобразования поля JSON в объект DateTime
+*/
 func (obj *DateTime) UnmarshalJSON(data []byte) error {
 	obj.setDefaultLayoutIfEmpty()
 	var s string
@@ -196,11 +263,17 @@ func (obj *DateTime) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+/*
+	Правило преобразования объекта DateTime в поле JSON
+*/
 func (obj DateTime) MarshalJSON() ([]byte, error) {
 	obj.setDefaultLayoutIfEmpty()
 	return []byte(strconv.Quote(obj.String())), nil
 }
 
+/*
+	Правило преобразования поля JSON в объект Date
+*/
 func (obj *Date) UnmarshalJSON(data []byte) error {
 	obj.setDefaultLayoutIfEmpty()
 	var s string
@@ -215,22 +288,33 @@ func (obj *Date) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+/*
+	Правило преобразования объекта Date в поле JSON
+*/
 func (obj Date) MarshalJSON() ([]byte, error) {
 	obj.setDefaultLayoutIfEmpty()
 	return []byte(strconv.Quote(obj.String())), nil
 }
 
+/*
+	Преобразует объект DateTime в строку согласно заданного шаблона
+*/
 func (obj DateTime) String() string {
 	obj.setDefaultLayoutIfEmpty()
 	return obj.Time.Format(obj.Layout)
 }
 
+/*
+	Преобразует объект Date в строку согласно заданного шаблона
+*/
 func (obj Date) String() string {
 	obj.setDefaultLayoutIfEmpty()
 	return obj.Time.Format(obj.Layout)
 }
 
-// Преобразует значение времени в БД к типу DateTime
+/*
+	Преобразует значение времени в БД к типу DateTime
+*/
 func (dt *DateTime) Scan(value interface{}) error {
 	dt.setDefaultLayoutIfEmpty()
 	if value == nil {
@@ -246,12 +330,16 @@ func (dt *DateTime) Scan(value interface{}) error {
 	return nil
 }
 
-// Преобразует значение типа DateTime к типу в БД
+/*
+	Преобразует значение типа DateTime к значению в БД
+*/
 func (dt DateTime) Value() (driver.Value, error) {
 	return dt.Time.In(defaultLocation).Format(DateTimeLayout), nil
 }
 
-// Преобразует значение времени в БД к типу Date
+/*
+	Преобразует значение времени в БД к типу Date
+*/
 func (dt *Date) Scan(value interface{}) error {
 	dt.setDefaultLayoutIfEmpty()
 	if value == nil {
@@ -267,7 +355,9 @@ func (dt *Date) Scan(value interface{}) error {
 	return nil
 }
 
-// Преобразует значение типа Date к типу в БД
+/*
+	Преобразует значение типа Date к значению в БД
+*/
 func (dt Date) Value() (driver.Value, error) {
 	return dt.Time.In(defaultLocation).Format(DateLayout), nil
 }
