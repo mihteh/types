@@ -64,3 +64,16 @@ func TestDaysBefore(t *testing.T) {
 		t.Fatalf("Ожидалось 2, получено %d дней", d)
 	}
 }
+
+func TestStringToDateTimeHMS(t *testing.T) {
+	s := "2015-07-30"
+	dt, err := StringDateToDateTimeHMS(s, 5, 6, 7)
+	if err != nil {
+		t.Fatal(err)
+	}
+	sExpected := "2015-07-30 05:06:07"
+	sReceived := dt.String()
+	if sExpected != sReceived {
+		t.Fatalf("Ожидалось получить строку %s, получена строка %s", sExpected, sReceived)
+	}
+}
