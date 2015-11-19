@@ -22,12 +22,10 @@ type Date struct {
 	Layout string
 }
 
-// timeModifier это интерфейс для обобщённых функций scan() и unmarshalJSON()
-// для объектов Date и DateTime
-type timeModifier interface {
+type timeSetter interface {
 	setTime(time.Time)
 	setDefaultLayoutIfEmpty()
-	parse(string) error
+	getLayout() string
 }
 
 // Шаблоны для сериализации
@@ -157,20 +155,20 @@ func (d *DateTime) setTime(t time.Time) {
 	d.Time = t
 }
 
-// parse устанавливает время в объекте Date на основе строки s и
-// Location defaultLocation
-func (d *Date) parse(s string) error {
-	t, err := time.ParseInLocation(d.Layout, s, defaultLocation)
-	if err == nil {
-		d.setTime(t)
-	}
-	return err
+// getLayout возвращает строку шаблона вывода в объекте Date
+func (d Date) getLayout() string {
+	return d.Layout
 }
 
-// parse устанавливает время в объекте DateTime на основе строки s и
-// Location defaultLocation
-func (d *DateTime) parse(s string) error {
-	t, err := time.ParseInLocation(d.Layout, s, defaultLocation)
+// getLayout возвращает строку шаблона вывода в объекте DateTime
+func (d DateTime) getLayout() string {
+	return d.Layout
+}
+
+// parse устанавливает время в объекте, реализующем интерфейс timeSetter
+// на основе строки s и Location defaultLocation
+func parse(d timeSetter, s string) error {
+	t, err := time.ParseInLocation(d.getLayout(), s, defaultLocation)
 	if err == nil {
 		d.setTime(t)
 	}
@@ -241,13 +239,13 @@ func (d DateTime) Between(d1, d2 DateTime) bool {
 	return d.After(d1) && d.Before(d2)
 }
 
-func unmarshalJSON(data []byte, to timeModifier) error {
+func unmarshalJSON(data []byte, to timeSetter) error {
 	to.setDefaultLayoutIfEmpty()
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
 		return err
 	}
-	return to.parse(s)
+	return parse(to, s)
 }
 
 // UnmarshalJSON - реализует интерфейс json.Unmarshaler для объекта DateTime
@@ -288,7 +286,7 @@ func (d Date) String() string {
 	return d.Time.Format(d.Layout)
 }
 
-func scan(from interface{}, to timeModifier) error {
+func scan(from interface{}, to timeSetter) error {
 	if from == nil {
 		return nil
 	}
