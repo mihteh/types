@@ -255,20 +255,20 @@ func TestDateTimeJSON(t *testing.T) {
 		t.Fatalf("Ошибка Marshal. Ожидалось получить JSON %s, получен JSON %s", jsonExpected, jsonReceived)
 	}
 
-	var dtFromJson DateTime
-	if err := json.Unmarshal(b, &dtFromJson); err != nil {
+	var dtFromJSON DateTime
+	if err := json.Unmarshal(b, &dtFromJSON); err != nil {
 		t.Fatal(err)
 	}
-	dtFromJsonString := dtFromJson.String()
-	if dtFromJsonString != dtString {
-		t.Fatalf("Ошибка Unmarshal. Ожидалось получить JSON %s, получен JSON %s", dtString, dtFromJsonString)
+	dtFromJSONString := dtFromJSON.String()
+	if dtFromJSONString != dtString {
+		t.Fatalf("Ошибка Unmarshal. Ожидалось получить JSON %s, получен JSON %s", dtString, dtFromJSONString)
 	}
 }
 
 func TestDateTimeUnmarshalBadJSON(t *testing.T) {
 	b := []byte(`"wrong"`)
-	var dtFromJson DateTime
-	if err := json.Unmarshal(b, &dtFromJson); err == nil {
+	var dtFromJSON DateTime
+	if err := json.Unmarshal(b, &dtFromJSON); err == nil {
 		t.Fatal("Ожидалась ошибка")
 	}
 }
@@ -289,20 +289,20 @@ func TestDateJSON(t *testing.T) {
 		t.Fatalf("Ошибка Marshal. Ожидалось получить JSON %s, получен JSON %s", jsonExpected, jsonReceived)
 	}
 
-	var dFromJson Date
-	if err := json.Unmarshal(b, &dFromJson); err != nil {
+	var dFromJSON Date
+	if err := json.Unmarshal(b, &dFromJSON); err != nil {
 		t.Fatal(err)
 	}
-	dFromJsonString := dFromJson.String()
-	if dFromJsonString != dString {
-		t.Fatalf("Ошибка Unmarshal. Ожидалось получить JSON %s, получен JSON %s", dString, dFromJsonString)
+	dFromJSONString := dFromJSON.String()
+	if dFromJSONString != dString {
+		t.Fatalf("Ошибка Unmarshal. Ожидалось получить JSON %s, получен JSON %s", dString, dFromJSONString)
 	}
 }
 
 func TestDateUnmarshalBadJSON(t *testing.T) {
 	b := []byte(`"wrong"`)
-	var dFromJson Date
-	if err := json.Unmarshal(b, &dFromJson); err == nil {
+	var dFromJSON Date
+	if err := json.Unmarshal(b, &dFromJSON); err == nil {
 		t.Fatal("Ожидалась ошибка")
 	}
 }
