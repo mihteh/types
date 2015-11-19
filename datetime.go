@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -24,7 +23,6 @@ type Date struct {
 
 type timeSetter interface {
 	setTime(time.Time)
-	setDefaultLayoutIfEmpty()
 	getLayout() string
 }
 
@@ -50,14 +48,18 @@ func init() {
 
 // ToDateTime формирует объект типа DateTime на основе времени t и шаблона DateTimeLayout
 func ToDateTime(t time.Time) DateTime {
-	return DateTime{t.In(defaultLocation), DateTimeLayout}
+	dt := NewDateTime()
+	dt.setTime(t.In(defaultLocation))
+	return dt
 }
 
 // ToDate формирует объект типа Date на основе времени t и шаблона DateLayout
 func ToDate(t time.Time) Date {
 	dS := fmt.Sprintf("%s %02d:%02d:%02d", t.Format(DateLayout), 0, 0, 0)
-	d, _ := time.ParseInLocation(DateTimeLayout, dS, defaultLocation)
-	return Date{d.In(defaultLocation), DateLayout}
+	parsedTime, _ := time.ParseInLocation(DateTimeLayout, dS, defaultLocation)
+	d := NewDate()
+	d.setTime(parsedTime)
+	return d
 }
 
 // DaysBefore возвращает количество полных дней, прошедших от d до endDate
@@ -115,6 +117,17 @@ func DateTimeNow() DateTime {
 	return ToDateTime(time.Now())
 }
 
+// NewDate создаёт новый объект типа Date с шаблоном вывода по умолчанию DateLayout
+func NewDate() Date {
+	return Date{Layout: DateLayout}
+}
+
+// NewDateTime создаёт новый объект типа DateTime
+// с шаблоном вывода по умолчанию DateTimeLayout
+func NewDateTime() DateTime {
+	return DateTime{Layout: DateTimeLayout}
+}
+
 // DateTimeTodayHMS возвращает объект DateTime, соответствующий дате сегодня,
 // с установленными значениями часов, минут, секунд согласно заданным параметрам
 // hours, mins, secs соответственно.
@@ -127,22 +140,6 @@ func DateTimeTodayHMS(hours int, mins int, secs int) DateTime {
 func NeverTime() DateTime {
 	t, _ := time.ParseInLocation(DateTimeLayout, "1990-01-01 00:00:00", defaultLocation)
 	return ToDateTime(t)
-}
-
-// setDefaultLayoutIfEmpty устанавливает в объекте DateTime шаблон вывода даты-времени
-// по умолчанию DateTimeLayout, если шаблон не установлен
-func (d *DateTime) setDefaultLayoutIfEmpty() {
-	if strings.TrimSpace(d.Layout) == "" {
-		d.Layout = DateTimeLayout
-	}
-}
-
-// setDefaultLayoutIfEmpty устанавливает в объекте Date шаблон вывода даты
-// по умолчанию DateLayout, если шаблон не установлен
-func (d *Date) setDefaultLayoutIfEmpty() {
-	if strings.TrimSpace(d.Layout) == "" {
-		d.Layout = DateLayout
-	}
 }
 
 // setTime устанавливает время в объекте Date без учёта Location
@@ -196,12 +193,10 @@ func (d DateTime) ConvertToDate() Date {
 // ConvertToDateTimeHMS преобразует объект Date в объект DateTime
 // с учётом заданных часов, минут, секунд в параметрах hours, mind, secs соответственно.
 func (d Date) ConvertToDateTimeHMS(hours int, mins int, secs int) DateTime {
-	dt := DateTime{
-		Time:   d.Time,
-		Layout: d.Layout,
-	}
+	dt := NewDateTime()
+	dt.Layout = d.Layout
+	dt.setTime(d.Time)
 	dt = dt.SetHMS(hours, mins, secs)
-
 	return dt
 }
 
@@ -240,7 +235,6 @@ func (d DateTime) Between(d1, d2 DateTime) bool {
 }
 
 func unmarshalJSON(data []byte, to timeSetter) error {
-	to.setDefaultLayoutIfEmpty()
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
 		return err
@@ -251,38 +245,36 @@ func unmarshalJSON(data []byte, to timeSetter) error {
 // UnmarshalJSON - реализует интерфейс json.Unmarshaler для объекта DateTime
 // десериализация происходит с учётом шаблона, заданного в свойстве Layout
 func (d *DateTime) UnmarshalJSON(data []byte) error {
+	*d = NewDateTime()
 	return unmarshalJSON(data, d)
 }
 
 // MarshalJSON - реализует интерфейс json.Marshaler для объекта DateTime
 // сериализация происходит с учётом шаблона, заданного в свойстве Layout
 func (d DateTime) MarshalJSON() ([]byte, error) {
-	d.setDefaultLayoutIfEmpty()
 	return []byte(strconv.Quote(d.String())), nil
 }
 
 // UnmarshalJSON - реализует интерфейс json.Unmarshaler для объекта Date
 // десериализация происходит с учётом шаблона, заданного в свойстве Layout
 func (d *Date) UnmarshalJSON(data []byte) error {
+	*d = NewDate()
 	return unmarshalJSON(data, d)
 }
 
 // MarshalJSON - реализует интерфейс json.Marshaler для объекта Date
 // сериализация происходит с учётом шаблона, заданного в свойстве Layout
 func (d Date) MarshalJSON() ([]byte, error) {
-	d.setDefaultLayoutIfEmpty()
 	return []byte(strconv.Quote(d.String())), nil
 }
 
 // String преобразует объект DateTime в строку согласно шаблона в свойстве Layout
 func (d DateTime) String() string {
-	d.setDefaultLayoutIfEmpty()
 	return d.Time.Format(d.Layout)
 }
 
 // String преобразует объект Date в строку согласно шаблона в свойстве Layout
 func (d Date) String() string {
-	d.setDefaultLayoutIfEmpty()
 	return d.Time.Format(d.Layout)
 }
 
@@ -298,13 +290,13 @@ func scan(from interface{}, to timeSetter) error {
 	}
 
 	to.setTime(t.In(defaultLocation))
-	to.setDefaultLayoutIfEmpty()
 	return nil
 }
 
 // Scan преобразует значение времени в БД к типу DateTime
 // Реализует интерфейс sql.Scanner
 func (d *DateTime) Scan(value interface{}) error {
+	*d = NewDateTime()
 	return scan(value, d)
 }
 
@@ -317,6 +309,7 @@ func (d DateTime) Value() (driver.Value, error) {
 // Scan преобразует значение времени в БД к типу Date
 // Реализует интерфейс sql.Scanner
 func (d *Date) Scan(value interface{}) error {
+	*d = NewDate()
 	return scan(value, d)
 }
 

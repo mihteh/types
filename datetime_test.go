@@ -143,24 +143,6 @@ func TestDateTimeTodayHMS(t *testing.T) {
 	}
 }
 
-func TestDateSetDefaultLayoutIfEmpty(t *testing.T) {
-	d := DateNow()
-	d.Layout = ""
-	d.setDefaultLayoutIfEmpty()
-	if d.Layout != DateLayout {
-		t.Fatal("Установлен неправильный Layout")
-	}
-}
-
-func TestDateTimeSetDefaultLayoutIfEmpty(t *testing.T) {
-	dt := DateTimeNow()
-	dt.Layout = ""
-	dt.setDefaultLayoutIfEmpty()
-	if dt.Layout != DateTimeLayout {
-		t.Fatal("Установлен неправильный Layout")
-	}
-}
-
 func TestDateBeforeAfterBetween(t *testing.T) {
 	dateToday := DateNow()
 	dateYesterday := ToDate(time.Now().AddDate(0, 0, -1))
