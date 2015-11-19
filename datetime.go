@@ -22,6 +22,10 @@ type Date struct {
 	Layout string
 }
 
+type timeSetter interface {
+	setTime(time.Time)
+}
+
 // Шаблоны для сериализации
 const (
 	DateTimeLayout        = "2006-01-02 15:04:05"
@@ -136,6 +140,14 @@ func (d *Date) setDefaultLayoutIfEmpty() {
 	if strings.TrimSpace(d.Layout) == "" {
 		d.Layout = DateLayout
 	}
+}
+
+func (d *Date) setTime(t time.Time) {
+	d.Time = t
+}
+
+func (d *DateTime) setTime(t time.Time) {
+	d.Time = t
 }
 
 // SetHMS возвращает новый объект DateTime на основе объекта d,
@@ -260,28 +272,27 @@ func (d Date) String() string {
 	return d.Time.Format(d.Layout)
 }
 
-func scan(value interface{}) (time.Time, error) {
+func scan(from interface{}, to timeSetter) error {
+	if from == nil {
+		return nil
+	}
+
 	t := time.Time{}
-	if value == nil {
-		return t, nil
-	}
-	t, ok := value.(time.Time)
+	t, ok := from.(time.Time)
 	if !ok {
-		return t, errors.New("Ошибка преобразования значения к типу time.Time")
+		return errors.New("Ошибка преобразования значения к типу time.Time")
 	}
-	return t.In(defaultLocation), nil
+
+	to.setTime(t.In(defaultLocation))
+
+	return nil
 }
 
 // Scan преобразует значение времени в БД к типу DateTime
 // Реализует интерфейс sql.Scanner
 func (d *DateTime) Scan(value interface{}) error {
 	d.setDefaultLayoutIfEmpty()
-	t, err := scan(value)
-	if err != nil {
-		return err
-	}
-	d.Time = t
-	return nil
+	return scan(value, d)
 }
 
 // Value преобразует значение типа DateTime к значению в БД
@@ -294,12 +305,7 @@ func (d DateTime) Value() (driver.Value, error) {
 // Реализует интерфейс sql.Scanner
 func (d *Date) Scan(value interface{}) error {
 	d.setDefaultLayoutIfEmpty()
-	t, err := scan(value)
-	if err != nil {
-		return err
-	}
-	d.Time = t
-	return nil
+	return scan(value, d)
 }
 
 // Value преобразует значение типа Date к значению в БД
