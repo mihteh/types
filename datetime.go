@@ -10,21 +10,19 @@ import (
 	"time"
 )
 
-// DateTime - тип для хранения даты-времени
+// DateTime хранит дату-время и шаблон для преобразования при сериализации
 type DateTime struct {
 	time.Time
 	Layout string
 }
 
-// Date - тип для хранения даты
+// Date хранит дату и шаблон для преобразования при сериализации
 type Date struct {
 	time.Time
 	Layout string
 }
 
-/*
-	Шаблоны вывода
-*/
+// Шаблоны для сериализации
 const (
 	DateTimeLayout        = "2006-01-02 15:04:05"
 	DateLayout            = "2006-01-02"
@@ -34,9 +32,7 @@ const (
 
 var defaultLocation *time.Location
 
-/*
-	Задаёт часовой пояс по умолчанию
-*/
+// Задаёт часовой пояс по умолчанию
 func init() {
 	var err error
 	defaultLocation, err = time.LoadLocation("Europe/Moscow")
@@ -45,7 +41,7 @@ func init() {
 	}
 }
 
-// ToDateTime возвращает время типом DateTime по стандартному шаблону
+// ToDateTime формирует объект типа DateTime на основе времени t и шаблона DateTimeLayout
 func ToDateTime(t time.Time) DateTime {
 	return DateTime{t.In(defaultLocation), DateTimeLayout}
 }
