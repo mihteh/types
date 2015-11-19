@@ -46,18 +46,18 @@ func ToDateTime(t time.Time) DateTime {
 	return DateTime{t.In(defaultLocation), DateTimeLayout}
 }
 
-// ToDate возвращает время типом Date по стандартному шаблону
+// ToDate формирует объект типа Date на основе времени t и шаблона DateLayout
 func ToDate(t time.Time) Date {
 	dS := fmt.Sprintf("%s %02d:%02d:%02d", t.Format(DateLayout), 0, 0, 0)
 	d, _ := time.ParseInLocation(DateTimeLayout, dS, defaultLocation)
 	return Date{d.In(defaultLocation), DateLayout}
 }
 
-// DaysBefore получает количество полных дней, прошедших от obj до b
-// Если obj было вчера, b - сегодня, то возвращается 1
-// Если b было раньше чем obj, то возвращается отрицательное число.
-func (obj Date) DaysBefore(b Date) int {
-	return int(b.Time.Sub(obj.Time).Hours() / 24)
+// DaysBefore возвращает количество полных дней, прошедших от d до endDate
+// Если d было вчера, endDate - сегодня, то возвращается 1
+// Если endDate было раньше чем d, то возвращается отрицательное число.
+func (d Date) DaysBefore(endDate Date) int {
+	return int(endDate.Time.Sub(d.Time).Hours() / 24)
 }
 
 // StringToDateTime преобразует строку по стандартному шаблону даты-времени в дату-время
@@ -121,132 +121,132 @@ func NeverTime() DateTime {
 
 // setDefaultLayoutIfEmpty устанавливает шаблон вывода даты-времени
 // по умолчанию, если шаблон не установлен
-func (obj *DateTime) setDefaultLayoutIfEmpty() {
-	if strings.TrimSpace(obj.Layout) == "" {
-		obj.Layout = DateTimeLayout
+func (d *DateTime) setDefaultLayoutIfEmpty() {
+	if strings.TrimSpace(d.Layout) == "" {
+		d.Layout = DateTimeLayout
 	}
 }
 
 // setDefaultLayoutIfEmpty устанавливает шаблон вывода даты по умолчанию, если шаблон не установлен
-func (obj *Date) setDefaultLayoutIfEmpty() {
-	if strings.TrimSpace(obj.Layout) == "" {
-		obj.Layout = DateLayout
+func (d *Date) setDefaultLayoutIfEmpty() {
+	if strings.TrimSpace(d.Layout) == "" {
+		d.Layout = DateLayout
 	}
 }
 
 // SetHMS устанавливает значения часов, минут и секунд
-func (obj DateTime) SetHMS(hours int, mins int, secs int) DateTime {
-	t := obj.Time
+func (d DateTime) SetHMS(hours int, mins int, secs int) DateTime {
+	t := d.Time
 	dS := fmt.Sprintf("%s %02d:%02d:%02d", t.Format(DateLayout), hours, mins, secs)
-	d, _ := time.ParseInLocation(DateTimeLayout, dS, defaultLocation)
-	obj.Time = d
-	return obj
+	dt, _ := time.ParseInLocation(DateTimeLayout, dS, defaultLocation)
+	d.Time = dt
+	return d
 }
 
 // ConvertToDate преобразует дату-время в дату
-func (obj DateTime) ConvertToDate() Date {
-	dS := obj.Time.Format(DateLayout)
+func (d DateTime) ConvertToDate() Date {
+	dS := d.Time.Format(DateLayout)
 	t, _ := time.ParseInLocation(DateLayout, dS, defaultLocation)
 	return ToDate(t)
 }
 
 // ConvertToDateTimeHMS преобразует дату в дату-время с заданными значениями часов, минут и секунд
-func (obj Date) ConvertToDateTimeHMS(hours int, mins int, secs int) DateTime {
-	d := DateTime{
-		Time:   obj.Time,
-		Layout: obj.Layout,
+func (d Date) ConvertToDateTimeHMS(hours int, mins int, secs int) DateTime {
+	dt := DateTime{
+		Time:   d.Time,
+		Layout: d.Layout,
 	}
-	d = d.SetHMS(hours, mins, secs)
+	dt = dt.SetHMS(hours, mins, secs)
 
-	return d
+	return dt
 }
 
-// After возвращает true если дата obj позднее d, иначе false
+// After возвращает true если дата d позднее d1, иначе false
 // Сравнение с точностью до дня.
-func (obj Date) After(d Date) bool {
-	return obj.Time.After(d.Time)
+func (d Date) After(d1 Date) bool {
+	return d.Time.After(d1.Time)
 }
 
-// Before возвращает true если дата obj ранее d, иначе false
+// Before возвращает true если дата d ранее d1, иначе false
 // Сравнение с точностью до дня.
-func (obj Date) Before(d Date) bool {
-	return obj.Time.Before(d.Time)
+func (d Date) Before(d1 Date) bool {
+	return d.Time.Before(d1.Time)
 }
 
-// Between возвращает true если дата obj находится в интервале дат (d1; d2), иначе false
+// Between возвращает true если дата d находится в интервале дат (d1; d2), иначе false
 // Сравнение с точностью до дня.
-func (obj Date) Between(d1, d2 Date) bool {
-	return obj.After(d1) && obj.Before(d2)
+func (d Date) Between(d1, d2 Date) bool {
+	return d.After(d1) && d.Before(d2)
 }
 
-// After возвращает true если дата-время obj позднее d, иначе false
-func (obj DateTime) After(d DateTime) bool {
-	return obj.Time.After(d.Time)
+// After возвращает true если дата-время obj позднее d1, иначе false
+func (d DateTime) After(d1 DateTime) bool {
+	return d.Time.After(d1.Time)
 }
 
-// Before возвращает true если дата-время obj ранее d, иначе false
-func (obj DateTime) Before(d DateTime) bool {
-	return obj.Time.Before(d.Time)
+// Before возвращает true если дата-время obj ранее d1, иначе false
+func (d DateTime) Before(d1 DateTime) bool {
+	return d.Time.Before(d1.Time)
 }
 
-// Between возвращает true если дата-время obj находится в интервале
+// Between возвращает true если дата-время d находится в интервале
 // даты-времени (d1; d2), иначе false
-func (obj DateTime) Between(d1, d2 DateTime) bool {
-	return obj.After(d1) && obj.Before(d2)
+func (d DateTime) Between(d1, d2 DateTime) bool {
+	return d.After(d1) && d.Before(d2)
 }
 
 // UnmarshalJSON - правило преобразования поля JSON в объект DateTime
-func (obj *DateTime) UnmarshalJSON(data []byte) error {
-	obj.setDefaultLayoutIfEmpty()
+func (d *DateTime) UnmarshalJSON(data []byte) error {
+	d.setDefaultLayoutIfEmpty()
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
 		return err
 	}
-	t, err := time.ParseInLocation(obj.Layout, s, defaultLocation)
+	t, err := time.ParseInLocation(d.Layout, s, defaultLocation)
 	if err != nil {
 		return err
 	}
-	obj.Time = t
+	d.Time = t
 	return nil
 }
 
 // MarshalJSON - правило преобразования объекта DateTime в поле JSON
-func (obj DateTime) MarshalJSON() ([]byte, error) {
-	obj.setDefaultLayoutIfEmpty()
-	return []byte(strconv.Quote(obj.String())), nil
+func (d DateTime) MarshalJSON() ([]byte, error) {
+	d.setDefaultLayoutIfEmpty()
+	return []byte(strconv.Quote(d.String())), nil
 }
 
 // UnmarshalJSON - правило преобразования поля JSON в объект Date
-func (obj *Date) UnmarshalJSON(data []byte) error {
-	obj.setDefaultLayoutIfEmpty()
+func (d *Date) UnmarshalJSON(data []byte) error {
+	d.setDefaultLayoutIfEmpty()
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
 		return err
 	}
-	t, err := time.ParseInLocation(obj.Layout, s, defaultLocation)
+	t, err := time.ParseInLocation(d.Layout, s, defaultLocation)
 	if err != nil {
 		return err
 	}
-	obj.Time = t
+	d.Time = t
 	return nil
 }
 
 // MarshalJSON - правило преобразования объекта Date в поле JSON
-func (obj Date) MarshalJSON() ([]byte, error) {
-	obj.setDefaultLayoutIfEmpty()
-	return []byte(strconv.Quote(obj.String())), nil
+func (d Date) MarshalJSON() ([]byte, error) {
+	d.setDefaultLayoutIfEmpty()
+	return []byte(strconv.Quote(d.String())), nil
 }
 
 // String преобразует объект DateTime в строку согласно заданного шаблона
-func (obj DateTime) String() string {
-	obj.setDefaultLayoutIfEmpty()
-	return obj.Time.Format(obj.Layout)
+func (d DateTime) String() string {
+	d.setDefaultLayoutIfEmpty()
+	return d.Time.Format(d.Layout)
 }
 
 // String преобразует объект Date в строку согласно заданного шаблона
-func (obj Date) String() string {
-	obj.setDefaultLayoutIfEmpty()
-	return obj.Time.Format(obj.Layout)
+func (d Date) String() string {
+	d.setDefaultLayoutIfEmpty()
+	return d.Time.Format(d.Layout)
 }
 
 func scanInternal(value interface{}) (time.Time, error) {
@@ -262,33 +262,33 @@ func scanInternal(value interface{}) (time.Time, error) {
 }
 
 // Scan преобразует значение времени в БД к типу DateTime
-func (obj *DateTime) Scan(value interface{}) error {
-	obj.setDefaultLayoutIfEmpty()
+func (d *DateTime) Scan(value interface{}) error {
+	d.setDefaultLayoutIfEmpty()
 	t, err := scanInternal(value)
 	if err != nil {
 		return err
 	}
-	obj.Time = t
+	d.Time = t
 	return nil
 }
 
 // Value преобразует значение типа DateTime к значению в БД
-func (obj DateTime) Value() (driver.Value, error) {
-	return obj.Time.In(defaultLocation).Format(DateTimeLayout), nil
+func (d DateTime) Value() (driver.Value, error) {
+	return d.Time.In(defaultLocation).Format(DateTimeLayout), nil
 }
 
 // Scan преобразует значение времени в БД к типу Date
-func (obj *Date) Scan(value interface{}) error {
-	obj.setDefaultLayoutIfEmpty()
+func (d *Date) Scan(value interface{}) error {
+	d.setDefaultLayoutIfEmpty()
 	t, err := scanInternal(value)
 	if err != nil {
 		return err
 	}
-	obj.Time = t
+	d.Time = t
 	return nil
 }
 
 // Value преобразует значение типа Date к значению в БД
-func (obj Date) Value() (driver.Value, error) {
-	return obj.Time.In(defaultLocation).Format(DateLayout), nil
+func (d Date) Value() (driver.Value, error) {
+	return d.Time.In(defaultLocation).Format(DateLayout), nil
 }
