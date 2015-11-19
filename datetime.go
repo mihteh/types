@@ -21,9 +21,18 @@ type Date struct {
 	Layout string
 }
 
+type timeModifier interface {
+	timeSetter
+	timeLayouter
+}
+
 type timeSetter interface {
 	setTime(time.Time)
+}
+
+type timeLayouter interface {
 	getLayout() string
+	setLayout(layout string)
 }
 
 // Шаблоны для сериализации
@@ -119,13 +128,17 @@ func DateTimeNow() DateTime {
 
 // NewDate создаёт новый объект типа Date с шаблоном вывода по умолчанию DateLayout
 func NewDate() Date {
-	return Date{Layout: DateLayout}
+	d := Date{}
+	d.setLayout(DateLayout)
+	return d
 }
 
 // NewDateTime создаёт новый объект типа DateTime
 // с шаблоном вывода по умолчанию DateTimeLayout
 func NewDateTime() DateTime {
-	return DateTime{Layout: DateTimeLayout}
+	d := DateTime{}
+	d.setLayout(DateTimeLayout)
+	return d
 }
 
 // DateTimeTodayHMS возвращает объект DateTime, соответствующий дате сегодня,
@@ -157,19 +170,19 @@ func (d Date) getLayout() string {
 	return d.Layout
 }
 
+// setLayout устанавливает Layout в объекте Date
+func (d *Date) setLayout(layout string) {
+	d.Layout = layout
+}
+
 // getLayout возвращает строку шаблона вывода в объекте DateTime
 func (d DateTime) getLayout() string {
 	return d.Layout
 }
 
-// parse устанавливает время в объекте, реализующем интерфейс timeSetter
-// на основе строки s и Location defaultLocation
-func parse(d timeSetter, s string) error {
-	t, err := time.ParseInLocation(d.getLayout(), s, defaultLocation)
-	if err == nil {
-		d.setTime(t)
-	}
-	return err
+// setLayout устанавливает Layout в объекте DateTime
+func (d *DateTime) setLayout(layout string) {
+	d.Layout = layout
 }
 
 // SetHMS возвращает новый объект DateTime на основе объекта d,
@@ -234,7 +247,17 @@ func (d DateTime) Between(d1, d2 DateTime) bool {
 	return d.After(d1) && d.Before(d2)
 }
 
-func unmarshalJSON(data []byte, to timeSetter) error {
+// parse устанавливает время в объекте, реализующем интерфейс timeModifier
+// на основе строки s и Location defaultLocation
+func parse(d timeModifier, s string) error {
+	t, err := time.ParseInLocation(d.getLayout(), s, defaultLocation)
+	if err == nil {
+		d.setTime(t)
+	}
+	return err
+}
+
+func unmarshalJSON(data []byte, to timeModifier) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
 		return err
@@ -245,7 +268,7 @@ func unmarshalJSON(data []byte, to timeSetter) error {
 // UnmarshalJSON - реализует интерфейс json.Unmarshaler для объекта DateTime
 // десериализация происходит с учётом шаблона, заданного в свойстве Layout
 func (d *DateTime) UnmarshalJSON(data []byte) error {
-	*d = NewDateTime()
+	d.setLayout(DateTimeLayout)
 	return unmarshalJSON(data, d)
 }
 
@@ -258,7 +281,7 @@ func (d DateTime) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON - реализует интерфейс json.Unmarshaler для объекта Date
 // десериализация происходит с учётом шаблона, заданного в свойстве Layout
 func (d *Date) UnmarshalJSON(data []byte) error {
-	*d = NewDate()
+	d.setLayout(DateLayout)
 	return unmarshalJSON(data, d)
 }
 
@@ -296,7 +319,7 @@ func scan(from interface{}, to timeSetter) error {
 // Scan преобразует значение времени в БД к типу DateTime
 // Реализует интерфейс sql.Scanner
 func (d *DateTime) Scan(value interface{}) error {
-	*d = NewDateTime()
+	d.setLayout(DateTimeLayout)
 	return scan(value, d)
 }
 
@@ -309,7 +332,7 @@ func (d DateTime) Value() (driver.Value, error) {
 // Scan преобразует значение времени в БД к типу Date
 // Реализует интерфейс sql.Scanner
 func (d *Date) Scan(value interface{}) error {
-	*d = NewDate()
+	d.setLayout(DateLayout)
 	return scan(value, d)
 }
 
