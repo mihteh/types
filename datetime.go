@@ -294,7 +294,7 @@ func (d DateTime) Value() (driver.Value, error) {
 // Реализует интерфейс sql.Scanner
 func (d *Date) Scan(value interface{}) error {
 	d.setDefaultLayoutIfEmpty()
-	t, err := scanInternal(value)
+	t, err := scan(value)
 	if err != nil {
 		return err
 	}
