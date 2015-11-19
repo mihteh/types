@@ -22,6 +22,8 @@ type Date struct {
 	Layout string
 }
 
+// timeModifier это интерфейс для обобщённых функций scan() и unmarshalJSON()
+// для объектов Date и DateTime
 type timeModifier interface {
 	setTime(time.Time)
 	setDefaultLayoutIfEmpty()
@@ -36,6 +38,7 @@ const (
 	GraphsDateShortLayout = "02.01"
 )
 
+// defaultLocation хранит значение по умолчанию для Location
 var defaultLocation *time.Location
 
 // Задаёт часовой пояс по умолчанию
@@ -144,14 +147,18 @@ func (d *Date) setDefaultLayoutIfEmpty() {
 	}
 }
 
+// setTime устанавливает время в объекте Date без учёта Location
 func (d *Date) setTime(t time.Time) {
 	d.Time = t
 }
 
+// setTime устанавливает время в объекте DateTime без учёта Location
 func (d *DateTime) setTime(t time.Time) {
 	d.Time = t
 }
 
+// parse устанавливает время в объекте Date на основе строки s и
+// Location defaultLocation
 func (d *Date) parse(s string) error {
 	t, err := time.ParseInLocation(d.Layout, s, defaultLocation)
 	if err == nil {
@@ -160,6 +167,8 @@ func (d *Date) parse(s string) error {
 	return err
 }
 
+// parse устанавливает время в объекте DateTime на основе строки s и
+// Location defaultLocation
 func (d *DateTime) parse(s string) error {
 	t, err := time.ParseInLocation(d.Layout, s, defaultLocation)
 	if err == nil {
