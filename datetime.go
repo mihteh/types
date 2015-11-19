@@ -33,6 +33,7 @@ type timeSetter interface {
 type timeLayouter interface {
 	getLayout() string
 	setLayout(layout string)
+	fixLayout()
 }
 
 // Шаблоны для сериализации
@@ -175,6 +176,13 @@ func (d *Date) setLayout(layout string) {
 	d.Layout = layout
 }
 
+// fixLayout устанавливает Layout в объекте Date на DateLayout если он не определён
+func (d *Date) fixLayout() {
+	if d.getLayout() == "" {
+		d.setLayout(DateLayout)
+	}
+}
+
 // getLayout возвращает строку шаблона вывода в объекте DateTime
 func (d DateTime) getLayout() string {
 	return d.Layout
@@ -183,6 +191,13 @@ func (d DateTime) getLayout() string {
 // setLayout устанавливает Layout в объекте DateTime
 func (d *DateTime) setLayout(layout string) {
 	d.Layout = layout
+}
+
+// fixLayout устанавливает Layout в объекте DateTime на DateTimeLayout если он не определён
+func (d *DateTime) fixLayout() {
+	if d.getLayout() == "" {
+		d.setLayout(DateTimeLayout)
+	}
 }
 
 // SetHMS возвращает новый объект DateTime на основе объекта d,
@@ -259,6 +274,7 @@ func parse(d timeModifier, s string) error {
 
 func unmarshalJSON(data []byte, to timeModifier) error {
 	var s string
+	to.fixLayout()
 	if err := json.Unmarshal(data, &s); err != nil {
 		return err
 	}
@@ -268,26 +284,26 @@ func unmarshalJSON(data []byte, to timeModifier) error {
 // UnmarshalJSON - реализует интерфейс json.Unmarshaler для объекта DateTime
 // десериализация происходит с учётом шаблона, заданного в свойстве Layout
 func (d *DateTime) UnmarshalJSON(data []byte) error {
-	d.setLayout(DateTimeLayout)
 	return unmarshalJSON(data, d)
 }
 
 // MarshalJSON - реализует интерфейс json.Marshaler для объекта DateTime
 // сериализация происходит с учётом шаблона, заданного в свойстве Layout
 func (d DateTime) MarshalJSON() ([]byte, error) {
+	d.fixLayout()
 	return []byte(strconv.Quote(d.String())), nil
 }
 
 // UnmarshalJSON - реализует интерфейс json.Unmarshaler для объекта Date
 // десериализация происходит с учётом шаблона, заданного в свойстве Layout
 func (d *Date) UnmarshalJSON(data []byte) error {
-	d.setLayout(DateLayout)
 	return unmarshalJSON(data, d)
 }
 
 // MarshalJSON - реализует интерфейс json.Marshaler для объекта Date
 // сериализация происходит с учётом шаблона, заданного в свойстве Layout
 func (d Date) MarshalJSON() ([]byte, error) {
+	d.fixLayout()
 	return []byte(strconv.Quote(d.String())), nil
 }
 
@@ -319,7 +335,7 @@ func scan(from interface{}, to timeSetter) error {
 // Scan преобразует значение времени в БД к типу DateTime
 // Реализует интерфейс sql.Scanner
 func (d *DateTime) Scan(value interface{}) error {
-	d.setLayout(DateTimeLayout)
+	d.fixLayout()
 	return scan(value, d)
 }
 
@@ -332,7 +348,7 @@ func (d DateTime) Value() (driver.Value, error) {
 // Scan преобразует значение времени в БД к типу Date
 // Реализует интерфейс sql.Scanner
 func (d *Date) Scan(value interface{}) error {
-	d.setLayout(DateLayout)
+	d.fixLayout()
 	return scan(value, d)
 }
 
