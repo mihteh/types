@@ -273,6 +273,7 @@ func scan(value interface{}) (time.Time, error) {
 }
 
 // Scan преобразует значение времени в БД к типу DateTime
+// Реализует интерфейс sql.Scanner
 func (d *DateTime) Scan(value interface{}) error {
 	d.setDefaultLayoutIfEmpty()
 	t, err := scan(value)
@@ -284,11 +285,13 @@ func (d *DateTime) Scan(value interface{}) error {
 }
 
 // Value преобразует значение типа DateTime к значению в БД
+// Реализует интерфейс driver.Valuer
 func (d DateTime) Value() (driver.Value, error) {
 	return d.Time.In(defaultLocation).Format(DateTimeLayout), nil
 }
 
 // Scan преобразует значение времени в БД к типу Date
+// Реализует интерфейс sql.Scanner
 func (d *Date) Scan(value interface{}) error {
 	d.setDefaultLayoutIfEmpty()
 	t, err := scanInternal(value)
@@ -300,6 +303,7 @@ func (d *Date) Scan(value interface{}) error {
 }
 
 // Value преобразует значение типа Date к значению в БД
+// Реализует интерфейс driver.Valuer
 func (d Date) Value() (driver.Value, error) {
 	return d.Time.In(defaultLocation).Format(DateLayout), nil
 }
