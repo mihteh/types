@@ -252,19 +252,26 @@ func (obj Date) String() string {
 	return obj.Time.Format(obj.Layout)
 }
 
+func scanInternal(value interface{}) (time.Time, error) {
+	t := time.Time{}
+	if value == nil {
+		return t, nil
+	}
+	t, ok := value.(time.Time)
+	if !ok {
+		return t, errors.New("Ошибка преобразования значения к типу time.Time")
+	}
+	return t.In(defaultLocation), nil
+}
+
 // Scan Преобразует значение времени в БД к типу DateTime
 func (obj *DateTime) Scan(value interface{}) error {
 	obj.setDefaultLayoutIfEmpty()
-	if value == nil {
-		return nil
+	t, err := scanInternal(value)
+	if err != nil {
+		return err
 	}
-
-	time, ok := value.(time.Time)
-	if !ok {
-		return errors.New("Ошибка преобразования значения к типу time.Time")
-	}
-
-	obj.Time = time.In(defaultLocation)
+	obj.Time = t
 	return nil
 }
 
@@ -276,16 +283,11 @@ func (obj DateTime) Value() (driver.Value, error) {
 // Scan Преобразует значение времени в БД к типу Date
 func (obj *Date) Scan(value interface{}) error {
 	obj.setDefaultLayoutIfEmpty()
-	if value == nil {
-		return nil
+	t, err := scanInternal(value)
+	if err != nil {
+		return err
 	}
-
-	time, ok := value.(time.Time)
-	if !ok {
-		return errors.New("Ошибка преобразования значения к типу time.Time")
-	}
-
-	obj.Time = time.In(defaultLocation)
+	obj.Time = t
 	return nil
 }
 
