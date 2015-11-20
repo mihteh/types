@@ -111,12 +111,6 @@ func StringToDate(s string) (Date, error) {
 	return ToDate(t), nil
 }
 
-// NeverDate возвращает объект Date, соответствующий дате в далёком прошлом
-func NeverDate() Date {
-	t, _ := time.ParseInLocation(DateLayout, "1990-01-01", defaultLocation)
-	return ToDate(t)
-}
-
 // DateNow возвращает объект Date, соответствующий дате сегодня
 func DateNow() Date {
 	return ToDate(time.Now())
@@ -150,9 +144,15 @@ func DateTimeTodayHMS(hours int, mins int, secs int) DateTime {
 	return d.SetHMS(hours, mins, secs)
 }
 
+// NeverDate возвращает объект Date, соответствующий дате в далёком прошлом
+func NeverDate() Date {
+	t, _ := time.ParseInLocation(DateLayout, "0001-01-01", defaultLocation)
+	return ToDate(t)
+}
+
 // NeverTime возвращает объект DateTime, соответствующий дате-времени в далёком прошлом
 func NeverTime() DateTime {
-	t, _ := time.ParseInLocation(DateTimeLayout, "1990-01-01 00:00:00", defaultLocation)
+	t, _ := time.ParseInLocation(DateTimeLayout, "0001-01-01 00:00:00", defaultLocation)
 	return ToDateTime(t)
 }
 
