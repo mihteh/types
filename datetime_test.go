@@ -362,3 +362,18 @@ func TestDateScanIfBadValue(t *testing.T) {
 		t.Fatal("Ожидалась ошибка")
 	}
 }
+
+func TestDateTimeEqualityBug(t *testing.T) {
+	var d1, d2 DateTime
+	for {
+		d1 = DateTimeNow()
+		time.Sleep(10 * time.Millisecond)
+		d2 = DateTimeNow()
+		if d1.Second() == d2.Second() {
+			break
+		}
+	}
+	if !d1.Equal(d2.Time) {
+		t.Fatalf("Ошибка сравнения DateTime из-за различий в миллисекундах. d1 = %v, d2 = %v", d1, d2)
+	}
+}
