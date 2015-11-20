@@ -248,20 +248,35 @@ func (d Date) Between(d1, d2 Date) bool {
 	return d.After(d1) && d.Before(d2)
 }
 
+// Equal возвращает true если дата d равна дате d1, иначе false
+// Сравнение происходит с точностью до дня.
+func (d Date) Equal(d1 Date) bool {
+	return d.Time.Equal(d1.Time)
+}
+
 // After возвращает true если дата-время d позднее d1, иначе false
+// Сравнение происходит с точностью до секунд.
 func (d DateTime) After(d1 DateTime) bool {
 	return d.Time.After(d1.Time)
 }
 
 // Before возвращает true если дата-время d ранее d1, иначе false
+// Сравнение происходит с точностью до секунд.
 func (d DateTime) Before(d1 DateTime) bool {
 	return d.Time.Before(d1.Time)
 }
 
 // Between возвращает true если дата-время d находится в интервале
 // даты-времени (d1; d2), иначе false
+// Сравнение происходит с точностью до секунд.
 func (d DateTime) Between(d1, d2 DateTime) bool {
 	return d.After(d1) && d.Before(d2)
+}
+
+// Equal возвращает true если дата-время d равна дате-времени d1, иначе false
+// Сравнение происходит с точностью до секунд.
+func (d DateTime) Equal(d1 DateTime) bool {
+	return d.Time.Equal(d1.Time)
 }
 
 // parse устанавливает время в объекте, реализующем интерфейс timeModifier

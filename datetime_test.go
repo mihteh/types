@@ -143,7 +143,7 @@ func TestDateTimeTodayHMS(t *testing.T) {
 	}
 }
 
-func TestDateBeforeAfterBetween(t *testing.T) {
+func TestDateBeforeAfterBetweenEqual(t *testing.T) {
 	dateToday := DateNow()
 	dateYesterday := ToDate(time.Now().AddDate(0, 0, -1))
 	dateTomorrow := ToDate(time.Now().AddDate(0, 0, 1))
@@ -159,6 +159,13 @@ func TestDateBeforeAfterBetween(t *testing.T) {
 	}
 	if dateToday.Between(dateYesterday, dateToday) {
 		t.Fatal("Сегодня не может быть между вчера и сегодня")
+	}
+
+	if dateToday.Equal(dateYesterday) {
+		t.Fatal("Сегодня не может быть вчера")
+	}
+	if dateToday.Equal(dateTomorrow) {
+		t.Fatal("Сегодня не может быть завтра")
 	}
 
 	if dateToday.Before(dateYesterday) {
@@ -180,9 +187,12 @@ func TestDateBeforeAfterBetween(t *testing.T) {
 	if !dateToday.Between(dateYesterday, dateTomorrow) {
 		t.Fatal("Сегодня должно быть между вчера и завтра")
 	}
+	if !dateToday.Equal(dateToday) {
+		t.Fatal("Сегодня должно быть сегодня")
+	}
 }
 
-func TestDateTimeBeforeAfterBetween(t *testing.T) {
+func TestDateTimeBeforeAfterBetweenEqual(t *testing.T) {
 	dateNow := DateTimeNow()
 	dateMinBefore := ToDateTime(time.Now().Add(-time.Minute))
 	dateMinAfter := ToDateTime(time.Now().Add(time.Minute))
@@ -198,6 +208,13 @@ func TestDateTimeBeforeAfterBetween(t *testing.T) {
 	}
 	if dateNow.Between(dateMinBefore, dateNow) {
 		t.Fatal("Сейчас не может быть между минуту назад и сейчас")
+	}
+
+	if dateNow.Equal(dateMinBefore) {
+		t.Fatal("Сейчас не может быть через минуту")
+	}
+	if dateNow.Equal(dateMinAfter) {
+		t.Fatal("Сейчас не может быть минуту назад")
 	}
 
 	if dateNow.Before(dateMinBefore) {
@@ -218,6 +235,9 @@ func TestDateTimeBeforeAfterBetween(t *testing.T) {
 	}
 	if !dateNow.Between(dateMinBefore, dateMinAfter) {
 		t.Fatal("Сейчас должно быть между минуту назад и через минуту")
+	}
+	if !dateNow.Equal(dateNow) {
+		t.Fatal("Сейчас должно быть сейчас")
 	}
 }
 
@@ -373,7 +393,7 @@ func TestDateTimeEqualityBug(t *testing.T) {
 			break
 		}
 	}
-	if !d1.Equal(d2.Time) {
+	if !d1.Equal(d2) {
 		t.Fatalf("Ошибка сравнения DateTime из-за различий в миллисекундах. d1 = %v, d2 = %v", d1, d2)
 	}
 }
