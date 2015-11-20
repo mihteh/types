@@ -58,8 +58,10 @@ func init() {
 
 // ToDateTime формирует объект типа DateTime на основе времени t и шаблона DateTimeLayout
 func ToDateTime(t time.Time) DateTime {
+	dS := t.Format(DateTimeLayout)
+	parsedDateTime, _ := time.ParseInLocation(DateTimeLayout, dS, defaultLocation)
 	dt := NewDateTime()
-	dt.setTime(t.In(defaultLocation))
+	dt.setTime(parsedDateTime)
 	return dt
 }
 
