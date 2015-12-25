@@ -190,6 +190,11 @@ func (d DateTime) getLayout() string {
 	return d.Layout
 }
 
+// Pointer возвращает указатель на объект DateTime
+func (d *DateTime) Pointer() *DateTime {
+	return d
+}
+
 // setLayout устанавливает Layout в объекте DateTime
 func (d *DateTime) setLayout(layout string) {
 	d.Layout = layout
@@ -252,6 +257,11 @@ func (d Date) Between(d1, d2 Date) bool {
 // Сравнение происходит с точностью до дня.
 func (d Date) Equal(d1 Date) bool {
 	return d.Time.Equal(d1.Time)
+}
+
+// Pointer возвращает указатель на объект Date
+func (d *Date) Pointer() *Date {
+	return d
 }
 
 // After возвращает true если дата-время d позднее d1, иначе false
