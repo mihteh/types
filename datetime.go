@@ -191,8 +191,8 @@ func (d DateTime) getLayout() string {
 }
 
 // Pointer возвращает указатель на объект DateTime
-func (d *DateTime) Pointer() *DateTime {
-	return d
+func (d DateTime) Pointer() *DateTime {
+	return &d
 }
 
 // setLayout устанавливает Layout в объекте DateTime
@@ -260,8 +260,8 @@ func (d Date) Equal(d1 Date) bool {
 }
 
 // Pointer возвращает указатель на объект Date
-func (d *Date) Pointer() *Date {
-	return d
+func (d Date) Pointer() *Date {
+	return &d
 }
 
 // After возвращает true если дата-время d позднее d1, иначе false
