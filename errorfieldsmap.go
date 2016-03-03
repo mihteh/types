@@ -1,16 +1,16 @@
 package types
 
-// ErrorFieldsMap реализует отображение имён полей в срезы сообщений об ошибках
+// Validation реализует отображение имён полей в срезы сообщений об ошибках
 // полезно при валидации
-type ErrorFieldsMap map[string][]string
+type Validation map[string][]string
 
-// NewErrorFieldsMap возвращает пустое отображение
-func NewErrorFieldsMap() ErrorFieldsMap {
-	return make(ErrorFieldsMap)
+// NewValidation возвращает пустое отображение
+func NewValidation() Validation {
+	return make(Validation)
 }
 
 // AddError добавляет поле c записью об ошибке
-func (e ErrorFieldsMap) AddError(name, value string) {
+func (e Validation) AddError(name, value string) {
 	if _, ok := e[name]; !ok {
 		e[name] = []string{value}
 		return
@@ -19,7 +19,7 @@ func (e ErrorFieldsMap) AddError(name, value string) {
 }
 
 // AddFromMap соединяет данные из from с данными из e, результат помещает в e
-func (e ErrorFieldsMap) AddFromMap(from ErrorFieldsMap) {
+func (e Validation) AddFromMap(from Validation) {
 	for name, value := range from {
 		if len(value) == 0 {
 			e[name] = []string{}
@@ -29,4 +29,14 @@ func (e ErrorFieldsMap) AddFromMap(from ErrorFieldsMap) {
 			e.AddError(name, element)
 		}
 	}
+}
+
+// HasErrors проверяет, есть ли ошибка. Возвращает true если есть, иначе false
+func (e Validation) HasErrors() bool {
+	for _, value := range e {
+		if len(value) > 0 {
+			return true
+		}
+	}
+	return false
 }
