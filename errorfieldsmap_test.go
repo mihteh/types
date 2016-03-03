@@ -27,7 +27,7 @@ func TestAddError(t *testing.T) {
 	}
 }
 
-func TestAddFromMap(t *testing.T) {
+func TestAddErrors(t *testing.T) {
 	to := Validation{
 		"key1": []string{"value1"},
 		"key2": []string{"value2", "value3"},
@@ -43,7 +43,7 @@ func TestAddFromMap(t *testing.T) {
 		"key3": []string{"value5"},
 		"key4": []string{},
 	}
-	to.AddFromMap(from)
+	to.AddErrors(from)
 	if !reflect.DeepEqual(to, expectedResult) {
 		t.Fatalf("Структуры не равны. Ожидалось: \n%v\nПолучено: \n%v\n",
 			expectedResult, to)

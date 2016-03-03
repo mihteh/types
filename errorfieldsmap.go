@@ -18,8 +18,8 @@ func (e Validation) AddError(name, value string) {
 	e[name] = append(e[name], value)
 }
 
-// AddFromMap соединяет данные из from с данными из e, результат помещает в e
-func (e Validation) AddFromMap(from Validation) {
+// AddErros добавляет к e ошибки из валидации from
+func (e Validation) AddErrors(from Validation) {
 	for name, value := range from {
 		if len(value) == 0 {
 			e[name] = []string{}
