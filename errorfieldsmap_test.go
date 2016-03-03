@@ -1,6 +1,7 @@
 package types
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -65,5 +66,27 @@ func TestHasErrors(t *testing.T) {
 	}
 	if hasNoErrors.HasErrors() {
 		t.Fatal("Не должно было быть ошибок")
+	}
+}
+
+func TestString(t *testing.T) {
+	hasErrors := Validation{
+		"key0": []string{},
+		"key1": []string{"value1"},
+		"key2": []string{"value2", "value3"},
+	}
+	expectedString := "key1: value1\nkey2: value2\nkey2: value3"
+	receivedString := fmt.Sprintf("%s", hasErrors)
+	if expectedString != receivedString {
+		t.Fatalf("Ожидалась строка: \n%s\nПолучено: \n%s\n", expectedString, receivedString)
+	}
+
+	hasNoErrors := Validation{
+		"key0": []string{},
+	}
+	expectedString = ""
+	receivedString = fmt.Sprintf("%s", hasNoErrors)
+	if expectedString != receivedString {
+		t.Fatalf("Ожидалась строка: \n%s\nПолучено: \n%s\n", expectedString, receivedString)
 	}
 }

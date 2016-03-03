@@ -1,5 +1,11 @@
 package types
 
+import (
+	"fmt"
+	"sort"
+	"strings"
+)
+
 // Validation реализует отображение имён полей в срезы сообщений об ошибках
 // полезно при валидации
 type Validation map[string][]string
@@ -39,4 +45,18 @@ func (e Validation) HasErrors() bool {
 		}
 	}
 	return false
+}
+
+// String описывает преобразование в строку
+func (e Validation) String() string {
+	var res string
+	for name, value := range e {
+		for _, element := range value {
+			res += fmt.Sprintf("%s: %s\n", name, element)
+		}
+	}
+
+	parts := strings.Split(res, "\n")
+	sort.Strings(parts)
+	return strings.TrimSpace(strings.Join(parts, "\n"))
 }
