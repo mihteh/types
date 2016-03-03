@@ -19,3 +19,26 @@ func TestAddError(t *testing.T) {
 			expectedErr, err)
 	}
 }
+
+func TestAddFromMap(t *testing.T) {
+	to := ErrorFieldsMap{
+		"key1": []string{"value1"},
+		"key2": []string{"value2", "value3"},
+	}
+	from := ErrorFieldsMap{
+		"key1": []string{"value4"},
+		"key3": []string{"value5"},
+		"key4": []string{},
+	}
+	expectedResult := ErrorFieldsMap{
+		"key1": []string{"value1", "value4"},
+		"key2": []string{"value2", "value3"},
+		"key3": []string{"value5"},
+		"key4": []string{},
+	}
+	to.AddFromMap(from)
+	if !reflect.DeepEqual(to, expectedResult) {
+		t.Fatalf("Структуры не равны. Ожидалось: \n%v\nПолучено: \n%v\n",
+			expectedResult, to)
+	}
+}
