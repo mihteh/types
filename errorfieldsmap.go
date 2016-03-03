@@ -4,6 +4,11 @@ package types
 // полезно при валидации
 type ErrorFieldsMap map[string][]string
 
+// NewErrorFieldsMap возвращает пустое отображение
+func NewErrorFieldsMap() ErrorFieldsMap {
+	return make(ErrorFieldsMap)
+}
+
 // AddError добавляет поле c записью об ошибке
 func (e ErrorFieldsMap) AddError(name, value string) {
 	if _, ok := e[name]; !ok {

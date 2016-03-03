@@ -5,6 +5,13 @@ import (
 	"testing"
 )
 
+func TestNewErrorFieldsMap(t *testing.T) {
+	result := NewErrorFieldsMap()
+	if result == nil {
+		t.Fatal("Получен nil")
+	}
+}
+
 func TestAddError(t *testing.T) {
 	expectedErr := ErrorFieldsMap{
 		"key1": []string{"value1"},
