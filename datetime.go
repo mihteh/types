@@ -384,3 +384,41 @@ func (d *Date) Scan(value interface{}) error {
 func (d Date) Value() (driver.Value, error) {
 	return d.Time.In(defaultLocation).Format(DateLayout), nil
 }
+
+// NullableDateTime это вспомогательный тип, необходимый для реализации
+// интерфейса Valuer на указателе
+type NullableDateTime struct {
+	DateTime
+}
+
+// NullableDate это вспомогательный тип, необходимый для реализации
+// интерфейса Valuer на указателе
+type NullableDate struct {
+	Date
+}
+
+// Scan преобразует значение времени в БД к типу NullableDateTime
+// Реализует интерфейс sql.Scanner
+func (d *NullableDateTime) Scan(value interface{}) error {
+	d.fixLayout()
+	return scan(value, d)
+}
+
+// Value преобразует значение типа NullableDateTime к значению в БД
+// Реализует интерфейс driver.Valuer
+func (d *NullableDateTime) Value() (driver.Value, error) {
+	return d.Time.In(defaultLocation).Format(DateTimeLayout), nil
+}
+
+// Scan преобразует значение времени в БД к типу NullableDate
+// Реализует интерфейс sql.Scanner
+func (d *NullableDate) Scan(value interface{}) error {
+	d.fixLayout()
+	return scan(value, d)
+}
+
+// Value преобразует значение типа NullableDate к значению в БД
+// Реализует интерфейс driver.Valuer
+func (d *NullableDate) Value() (driver.Value, error) {
+	return d.Time.In(defaultLocation).Format(DateLayout), nil
+}
