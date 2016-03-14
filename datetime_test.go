@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 	"time"
+	"reflect"
 )
 
 /*
@@ -395,5 +396,59 @@ func TestDateTimeEqualityBug(t *testing.T) {
 	}
 	if !d1.Equal(d2) {
 		t.Fatalf("Ошибка сравнения DateTime из-за различий в миллисекундах. d1 = %v, d2 = %v", d1, d2)
+	}
+}
+
+func TestNullableDateTime(t *testing.T) {
+	dt := DateTimeNow()
+	expected := NullableDateTime{DateTime: dt}
+	received := dt.Nullable()
+	if received == nil {
+		t.Fatal("Получен nil")
+	}
+	if !reflect.DeepEqual(*received, expected) {
+		t.Fatal("Не равны. Ожидаось: %v, получено: %v", expected, *received)
+	}
+}
+
+func TestNullableDate(t *testing.T) {
+	d := DateNow()
+	expected := NullableDate{Date: d}
+	received := d.Nullable()
+	if received == nil {
+		t.Fatal("Получен nil")
+	}
+	if !reflect.DeepEqual(*received, expected) {
+		t.Fatal("Не равны. Ожидаось: %v, получено: %v", expected, *received)
+	}
+}
+
+// Проверяет что на вспомогательном типе со встраиванием
+// нормально работает Marshal/Unmarshal JSON встроенного типа
+func TestThatJSONWorksOnNullableDate(t *testing.T) {
+	nd := DateNow().Nullable()
+	jsonBytes, err := json.Marshal(nd)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := fmt.Sprintf(`"%s"`, nd)
+	received := string(jsonBytes)
+	if expected != received {
+		t.Fatalf("Неправильное отображение в JSON. Ожидалось: %v, получено: %v", expected, received)
+	}
+
+	nullableDateFromJSON := MakeNullableDate()
+
+	if err := json.Unmarshal([]byte(received), nullableDateFromJSON); err != nil {
+		t.Fatal(err)
+	}
+
+	if nullableDateFromJSON == nil {
+		t.Fatal("Получен nil")
+	}
+
+	if !reflect.DeepEqual(*nullableDateFromJSON, *nd) {
+		t.Fatalf("Не равны. Получено из JSON: %v, ожидалось: %v", *nullableDateFromJSON, *nd)
 	}
 }
