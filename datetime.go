@@ -385,98 +385,146 @@ func (d Date) Value() (driver.Value, error) {
 	return d.Time.In(defaultLocation).Format(DateLayout), nil
 }
 
-// NullableDateTime это вспомогательный тип, необходимый для реализации
+// NullDateTime это вспомогательный тип, необходимый для реализации
 // интерфейса Valuer на указателе
-type NullableDateTime struct {
+type NullDateTime struct {
 	DateTime
+	Valid bool
 }
 
-// NullableDate это вспомогательный тип, необходимый для реализации
+// NullDate это вспомогательный тип, необходимый для реализации
 // интерфейса Valuer на указателе
-type NullableDate struct {
+type NullDate struct {
 	Date
+	Valid bool
 }
 
-// Scan преобразует значение времени в БД к типу NullableDateTime
+// Scan преобразует значение времени в БД к типу NullDateTime
 // Реализует интерфейс sql.Scanner
-func (d *NullableDateTime) Scan(value interface{}) error {
+func (d *NullDateTime) Scan(value interface{}) error {
 	d.fixLayout()
+	if value == nil {
+		d.Valid = false
+		return nil
+	}
 	return scan(value, d)
 }
 
-// Value преобразует значение типа NullableDateTime к значению в БД
+// Value преобразует значение типа NullDateTime к значению в БД
 // Реализует интерфейс driver.Valuer
-func (d *NullableDateTime) Value() (driver.Value, error) {
+func (d NullDateTime) Value() (driver.Value, error) {
+	if !d.Valid {
+		return nil, nil
+	}
 	return d.Time.In(defaultLocation).Format(DateTimeLayout), nil
 }
 
 // Scan преобразует значение времени в БД к типу NullableDate
 // Реализует интерфейс sql.Scanner
-func (d *NullableDate) Scan(value interface{}) error {
+func (d *NullDate) Scan(value interface{}) error {
 	d.fixLayout()
+	if value == nil {
+		d.Valid = false
+		return nil
+	}
 	return scan(value, d)
 }
 
-// Value преобразует значение типа NullableDate к значению в БД
+// Value преобразует значение типа NullDate к значению в БД
 // Реализует интерфейс driver.Valuer
-func (d *NullableDate) Value() (driver.Value, error) {
+func (d NullDate) Value() (driver.Value, error) {
+	if !d.Valid {
+		return nil, nil
+	}
 	return d.Time.In(defaultLocation).Format(DateLayout), nil
 }
 
-// Nullable преобразует тип DateTime в тип *NullableDateTime
-func (dt DateTime) Nullable() *NullableDateTime {
-	ndt := NullableDateTime{
+// Nullable преобразует тип DateTime в тип NullDateTime
+func (dt DateTime) Nullable() NullDateTime {
+	ndt := NullDateTime{
 		DateTime: dt,
+		Valid:    true,
 	}
-	return &ndt
+	return ndt
 }
 
-// Nullable преобразует тип Date в тип *NullableDate
-func (d Date) Nullable() *NullableDate {
-	nd := NullableDate{
-		Date: d,
+// Nullable преобразует тип Date в тип NullDate
+func (d Date) Nullable() NullDate {
+	nd := NullDate{
+		Date:  d,
+		Valid: true,
 	}
-	return &nd
+	return nd
 }
 
-func MakeNullableDateTime() *NullableDateTime {
-	return &NullableDateTime{
-		DateTime: NeverTime(),
+// isJSONBytesNil проверяет, содержит ли JSON nil значение
+func isJSONBytesNil(data []byte) (bool, error) {
+	var err error
+	var v interface{}
+	if err = json.Unmarshal(data, &v); err != nil {
+		return true, err
 	}
+	switch v.(type) {
+	case nil:
+		return true, nil
+	}
+	return false, nil
 }
 
-func MakeNullableDate() *NullableDate {
-	return &NullableDate{
-		Date: NeverDate(),
-	}
-}
-
-// UnmarshalJSON - реализует интерфейс json.Unmarshaler для объекта NullableDateTime
+// UnmarshalJSON - реализует интерфейс json.Unmarshaler для объекта NullDateTime
 // десериализация происходит с учётом шаблона, заданного в свойстве Layout
-func (d *NullableDateTime) UnmarshalJSON(data []byte) error {
-	if d == nil {
-		d = MakeNullableDateTime()
-	}
-	obj := d.DateTime
-	pobj := &obj
-	if err := pobj.UnmarshalJSON(data); err != nil {
+func (d *NullDateTime) UnmarshalJSON(data []byte) error {
+	isNil, err := isJSONBytesNil(data)
+	if err != nil {
 		return err
 	}
+	if isNil {
+		d.Valid = false
+		return nil
+	}
+
+	pobj := &DateTime{}
+	err = pobj.UnmarshalJSON(data)
 	d.DateTime = *pobj
-	return nil
+	d.Valid = err == nil
+	return err
 }
 
-// UnmarshalJSON - реализует интерфейс json.Unmarshaler для объекта NullableDate
+// UnmarshalJSON - реализует интерфейс json.Unmarshaler для объекта NullDate
 // десериализация происходит с учётом шаблона, заданного в свойстве Layout
-func (d *NullableDate) UnmarshalJSON(data []byte) error {
-	if d == nil {
-	d = MakeNullableDate()
-	}
-	obj := d.Date
-	pobj := &obj
-	if err := pobj.UnmarshalJSON(data); err != nil {
+func (d *NullDate) UnmarshalJSON(data []byte) error {
+	isNil, err := isJSONBytesNil(data)
+	if err != nil {
 		return err
 	}
+	if isNil {
+		d.Valid = false
+		return nil
+	}
+
+	pobj := &Date{}
+	err = pobj.UnmarshalJSON(data)
 	d.Date = *pobj
-	return nil
+	d.Valid = err == nil
+	return err
+}
+
+// MarshalJSON - реализует интерфейс json.Marshaler для объекта NullDateTime
+// сериализация происходит с учётом шаблона, заданного в свойстве Layout
+func (d NullDateTime) MarshalJSON() ([]byte, error) {
+	if !d.Valid {
+		return []byte("null"), nil
+	}
+	d.fixLayout()
+	return []byte(strconv.Quote(d.String())), nil
+}
+
+// MarshalJSON - реализует интерфейс json.Marshaler для объекта NullDate
+// сериализация происходит с учётом шаблона, заданного в свойстве Layout
+func (d NullDate) MarshalJSON() ([]byte, error) {
+	if !d.Valid {
+		return []byte("null"), nil
+	}
+	d.fixLayout()
+	return []byte(strconv.Quote(d.String())), nil
 }

@@ -3,9 +3,9 @@ package types
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"testing"
 	"time"
-	"reflect"
 )
 
 /*
@@ -401,31 +401,26 @@ func TestDateTimeEqualityBug(t *testing.T) {
 
 func TestNullableDateTime(t *testing.T) {
 	dt := DateTimeNow()
-	expected := NullableDateTime{DateTime: dt}
-	received := dt.Nullable()
-	if received == nil {
-		t.Fatal("Получен nil")
+	expected := NullDateTime{
+		DateTime: dt,
+		Valid:    true,
 	}
-	if !reflect.DeepEqual(*received, expected) {
-		t.Fatal("Не равны. Ожидаось: %v, получено: %v", expected, *received)
+	received := dt.Nullable()
+	if !reflect.DeepEqual(received, expected) {
+		t.Fatal("Не равны. Ожидаось: %v, получено: %v", expected, received)
 	}
 }
 
 func TestNullableDate(t *testing.T) {
 	d := DateNow()
-	expected := NullableDate{Date: d}
+	expected := NullDate{Date: d, Valid: true}
 	received := d.Nullable()
-	if received == nil {
-		t.Fatal("Получен nil")
-	}
-	if !reflect.DeepEqual(*received, expected) {
-		t.Fatal("Не равны. Ожидаось: %v, получено: %v", expected, *received)
+	if !reflect.DeepEqual(received, expected) {
+		t.Fatal("Не равны. Ожидаось: %v, получено: %v", expected, received)
 	}
 }
 
-// Проверяет что на вспомогательном типе со встраиванием
-// нормально работает Marshal/Unmarshal JSON встроенного типа
-func TestThatJSONWorksOnNullableDate(t *testing.T) {
+func TestMarshalUnmarshalJSONForNullDateIfValid(t *testing.T) {
 	nd := DateNow().Nullable()
 	jsonBytes, err := json.Marshal(nd)
 	if err != nil {
@@ -438,17 +433,79 @@ func TestThatJSONWorksOnNullableDate(t *testing.T) {
 		t.Fatalf("Неправильное отображение в JSON. Ожидалось: %v, получено: %v", expected, received)
 	}
 
-	nullableDateFromJSON := MakeNullableDate()
-
-	if err := json.Unmarshal([]byte(received), nullableDateFromJSON); err != nil {
+	var fromJSON NullDate
+	if err := json.Unmarshal([]byte(received), &fromJSON); err != nil {
 		t.Fatal(err)
 	}
 
-	if nullableDateFromJSON == nil {
-		t.Fatal("Получен nil")
+	if !reflect.DeepEqual(fromJSON, nd) {
+		t.Fatalf("Не равны. Получено из JSON: %v, ожидалось: %v", fromJSON, nd)
+	}
+}
+
+func TestMarshalUnmarshalJSONForNullDateIfNotValid(t *testing.T) {
+	nd := NullDate{Valid: false}
+	jsonBytes, err := json.Marshal(nd)
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	if !reflect.DeepEqual(*nullableDateFromJSON, *nd) {
-		t.Fatalf("Не равны. Получено из JSON: %v, ожидалось: %v", *nullableDateFromJSON, *nd)
+	expected := fmt.Sprintf(`null`)
+	received := string(jsonBytes)
+	if expected != received {
+		t.Fatalf("Неправильное отображение в JSON. Ожидалось: %v, получено: %v", expected, received)
+	}
+
+	var fromJSON NullDate
+	if err := json.Unmarshal([]byte(received), &fromJSON); err != nil {
+		t.Fatal(err)
+	}
+	if fromJSON.Valid {
+		t.Fatal("Valid == true, а должно быть false")
+	}
+}
+
+func TestMarshalUnmarshalJSONForNullDateTimeIfValid(t *testing.T) {
+	ndt := DateTimeNow().Nullable()
+	jsonBytes, err := json.Marshal(ndt)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := fmt.Sprintf(`"%s"`, ndt)
+	received := string(jsonBytes)
+	if expected != received {
+		t.Fatalf("Неправильное отображение в JSON. Ожидалось: %v, получено: %v", expected, received)
+	}
+
+	var fromJSON NullDateTime
+	if err := json.Unmarshal([]byte(received), &fromJSON); err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(fromJSON, ndt) {
+		t.Fatalf("Не равны. Получено из JSON: %v, ожидалось: %v", fromJSON, ndt)
+	}
+}
+
+func TestMarshalUnmarshalJSONForNullDateTimeIfNotValid(t *testing.T) {
+	ndt := NullDateTime{Valid: false}
+	jsonBytes, err := json.Marshal(ndt)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := fmt.Sprintf(`null`)
+	received := string(jsonBytes)
+	if expected != received {
+		t.Fatalf("Неправильное отображение в JSON. Ожидалось: %v, получено: %v", expected, received)
+	}
+
+	var fromJSON NullDate
+	if err := json.Unmarshal([]byte(received), &fromJSON); err != nil {
+		t.Fatal(err)
+	}
+	if fromJSON.Valid {
+		t.Fatal("Valid == true, а должно быть false")
 	}
 }
