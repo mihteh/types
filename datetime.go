@@ -528,3 +528,13 @@ func (d NullDate) MarshalJSON() ([]byte, error) {
 	d.fixLayout()
 	return []byte(strconv.Quote(d.String())), nil
 }
+
+// MakeNullDate возвразает NullDate со значением NULL
+func MakeNullDate() NullDate {
+	return NullDate{Valid: false}
+}
+
+// MakeNullDateTime возвращает NullDateTime со значением NULL
+func MakeNullDateTime() NullDateTime {
+	return NullDateTime{Valid: false}
+}

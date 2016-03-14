@@ -444,7 +444,7 @@ func TestMarshalUnmarshalJSONForNullDateIfValid(t *testing.T) {
 }
 
 func TestMarshalUnmarshalJSONForNullDateIfNotValid(t *testing.T) {
-	nd := NullDate{Valid: false}
+	nd := MakeNullDate()
 	jsonBytes, err := json.Marshal(nd)
 	if err != nil {
 		t.Fatal(err)
@@ -489,7 +489,7 @@ func TestMarshalUnmarshalJSONForNullDateTimeIfValid(t *testing.T) {
 }
 
 func TestMarshalUnmarshalJSONForNullDateTimeIfNotValid(t *testing.T) {
-	ndt := NullDateTime{Valid: false}
+	ndt := MakeNullDateTime()
 	jsonBytes, err := json.Marshal(ndt)
 	if err != nil {
 		t.Fatal(err)
