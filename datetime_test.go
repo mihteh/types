@@ -572,11 +572,101 @@ func TestMarshalUnmarshalJSONForNullDateTimeIfNotValid(t *testing.T) {
 		t.Fatalf("Неправильное отображение в JSON. Ожидалось: %v, получено: %v", expected, received)
 	}
 
-	var fromJSON NullDate
+	var fromJSON NullDateTime
 	if err := json.Unmarshal([]byte(received), &fromJSON); err != nil {
 		t.Fatal(err)
 	}
 	if fromJSON.Valid {
+		t.Fatal("Valid == true, а должно быть false")
+	}
+}
+
+func TestMarshalUnmarshalXMLForNullDateTimeIfValid(t *testing.T) {
+	ndt := DateTimeNow().Nullable()
+	xmlBytes, err := xml.Marshal(ndt)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := fmt.Sprintf(`<NullDateTime>%s</NullDateTime>`, ndt)
+	received := string(xmlBytes)
+	if expected != received {
+		t.Fatalf("Неправильное отображение в XML. Ожидалось: %v, получено: %v", expected, received)
+	}
+
+	var fromXML NullDateTime
+	if err := xml.Unmarshal([]byte(received), &fromXML); err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(fromXML, ndt) {
+		t.Fatalf("Не равны. Получено из XML: %v, ожидалось: %v", fromXML, ndt)
+	}
+}
+
+func TestMarshalUnmarshalXMLForNullDateTimeIfNotValid(t *testing.T) {
+	ndt := MakeNullDateTime()
+	xmlBytes, err := xml.Marshal(ndt)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := fmt.Sprintf("<NullDateTime></NullDateTime>")
+	received := string(xmlBytes)
+	if expected != received {
+		t.Fatalf("Неправильное отображение в XML. Ожидалось: %v, получено: %v", expected, received)
+	}
+
+	var fromXML NullDateTime
+	if err := xml.Unmarshal([]byte(received), &fromXML); err != nil {
+		t.Fatal(err)
+	}
+	if fromXML.Valid {
+		t.Fatal("Valid == true, а должно быть false")
+	}
+}
+
+func TestMarshalUnmarshalXMLForNullDateIfValid(t *testing.T) {
+	nd := DateNow().Nullable()
+	xmlBytes, err := xml.Marshal(nd)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := fmt.Sprintf(`<NullDate>%s</NullDate>`, nd)
+	received := string(xmlBytes)
+	if expected != received {
+		t.Fatalf("Неправильное отображение в XML. Ожидалось: %v, получено: %v", expected, received)
+	}
+
+	var fromXML NullDate
+	if err := xml.Unmarshal([]byte(received), &fromXML); err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(fromXML, nd) {
+		t.Fatalf("Не равны. Получено из XML: %v, ожидалось: %v", fromXML, nd)
+	}
+}
+
+func TestMarshalUnmarshalXMLForNullDateIfNotValid(t *testing.T) {
+	nd := MakeNullDate()
+	xmlBytes, err := xml.Marshal(nd)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := fmt.Sprintf("<NullDate></NullDate>")
+	received := string(xmlBytes)
+	if expected != received {
+		t.Fatalf("Неправильное отображение в XML. Ожидалось: %v, получено: %v", expected, received)
+	}
+
+	var fromXML NullDate
+	if err := xml.Unmarshal([]byte(received), &fromXML); err != nil {
+		t.Fatal(err)
+	}
+	if fromXML.Valid {
 		t.Fatal("Valid == true, а должно быть false")
 	}
 }

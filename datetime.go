@@ -572,26 +572,63 @@ func (d NullDate) String() string {
 	return d.Date.String()
 }
 
-/*// UnmarshalXML реализует интерфейс xml.Unmarshaler для объекта DateTime
+// UnmarshalXML реализует интерфейс xml.Unmarshaler для объекта NullDateTime
 // десериализация происходит с учётом шаблона, заданного в свойстве Layout
 func (d *NullDateTime) UnmarshalXML(decoder *xml.Decoder, start xml.StartElement) error {
 	var content string
 	if err := decoder.DecodeElement(&content, &start); err != nil {
 		return err
 	}
-	d.fixLayout()
-	return parse(d, content)
+	if content == "" {
+		d.Valid = false
+		return nil
+	}
+	pobj := &DateTime{}
+	pobj.fixLayout()
+	err := parse(pobj, content)
+	d.DateTime = *pobj
+	d.Valid = err == nil
+	return err
 }
 
-// MarshalXML реализует интерфейс xml.Marshaler для объекта DateTime
+// MarshalXML реализует интерфейс xml.Marshaler для объекта NullDateTime
 // сериализация происходит с учётом шаблона, заданного в свойстве Layout
 func (d NullDateTime) MarshalXML(encoder *xml.Encoder, start xml.StartElement) error {
 	if !d.Valid {
-		return encoder
+		return encoder.EncodeElement("", start)
 	}
 	d.fixLayout()
 	return encoder.EncodeElement(d.String(), start)
-}*/
+}
+
+// UnmarshalXML реализует интерфейс xml.Unmarshaler для объекта NullDate
+// десериализация происходит с учётом шаблона, заданного в свойстве Layout
+func (d *NullDate) UnmarshalXML(decoder *xml.Decoder, start xml.StartElement) error {
+	var content string
+	if err := decoder.DecodeElement(&content, &start); err != nil {
+		return err
+	}
+	if content == "" {
+		d.Valid = false
+		return nil
+	}
+	pobj := &Date{}
+	pobj.fixLayout()
+	err := parse(pobj, content)
+	d.Date = *pobj
+	d.Valid = err == nil
+	return err
+}
+
+// MarshalXML реализует интерфейс xml.Marshaler для объекта NullDate
+// сериализация происходит с учётом шаблона, заданного в свойстве Layout
+func (d NullDate) MarshalXML(encoder *xml.Encoder, start xml.StartElement) error {
+	if !d.Valid {
+		return encoder.EncodeElement("", start)
+	}
+	d.fixLayout()
+	return encoder.EncodeElement(d.String(), start)
+}
 
 // MarshalJSON - реализует интерфейс json.Marshaler для объекта NullDate
 // сериализация происходит с учётом шаблона, заданного в свойстве Layout
