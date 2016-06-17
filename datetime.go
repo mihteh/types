@@ -456,7 +456,7 @@ func (d NullDateTime) Value() (driver.Value, error) {
 	return d.Time.In(defaultLocation).Format(DateTimeLayout), nil
 }
 
-// Scan преобразует значение времени в БД к типу NullableDate
+// Scan преобразует значение времени в БД к типу NullDate
 // Реализует интерфейс sql.Scanner
 func (d *NullDate) Scan(value interface{}) error {
 	d.fixLayout()
