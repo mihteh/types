@@ -3,6 +3,7 @@ package types
 import (
 	"database/sql/driver"
 	"encoding/json"
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"strconv"
@@ -321,6 +322,24 @@ func (d DateTime) MarshalJSON() ([]byte, error) {
 	return []byte(strconv.Quote(d.String())), nil
 }
 
+// UnmarshalXML реализует интерфейс xml.Unmarshaler для объекта DateTime
+// десериализация происходит с учётом шаблона, заданного в свойстве Layout
+func (d *DateTime) UnmarshalXML(decoder *xml.Decoder, start xml.StartElement) error {
+	var content string
+	if err := decoder.DecodeElement(&content, &start); err != nil {
+		return err
+	}
+	d.fixLayout()
+	return parse(d, content)
+}
+
+// MarshalXML реализует интерфейс xml.Marshaler для объекта DateTime
+// сериализация происходит с учётом шаблона, заданного в свойстве Layout
+func (d DateTime) MarshalXML(encoder *xml.Encoder, start xml.StartElement) error {
+	d.fixLayout()
+	return encoder.EncodeElement(d.String(), start)
+}
+
 // UnmarshalJSON - реализует интерфейс json.Unmarshaler для объекта Date
 // десериализация происходит с учётом шаблона, заданного в свойстве Layout
 func (d *Date) UnmarshalJSON(data []byte) error {
@@ -332,6 +351,24 @@ func (d *Date) UnmarshalJSON(data []byte) error {
 func (d Date) MarshalJSON() ([]byte, error) {
 	d.fixLayout()
 	return []byte(strconv.Quote(d.String())), nil
+}
+
+// UnmarshalXML реализует интерфейс xml.Unmarshaler для объекта Date
+// десериализация происходит с учётом шаблона, заданного в свойстве Layout
+func (d *Date) UnmarshalXML(decoder *xml.Decoder, start xml.StartElement) error {
+	var content string
+	if err := decoder.DecodeElement(&content, &start); err != nil {
+		return err
+	}
+	d.fixLayout()
+	return parse(d, content)
+}
+
+// MarshalXML реализует интерфейс xml.Marshaler для объекта Date
+// сериализация происходит с учётом шаблона, заданного в свойстве Layout
+func (d Date) MarshalXML(encoder *xml.Encoder, start xml.StartElement) error {
+	d.fixLayout()
+	return encoder.EncodeElement(d.String(), start)
 }
 
 // String преобразует объект DateTime в строку согласно шаблона в свойстве Layout

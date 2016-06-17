@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"reflect"
 	"testing"
@@ -268,6 +269,32 @@ func TestDateTimeJSON(t *testing.T) {
 	}
 }
 
+func TestDateTimeXML(t *testing.T) {
+	dtString := "2015-07-30 20:58:59"
+	xmlExpected := fmt.Sprintf("<DateTime>%s</DateTime>", dtString)
+	dt, err := StringToDateTime(dtString)
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, err := xml.Marshal(dt)
+	if err != nil {
+		t.Fatal(err)
+	}
+	xmlReceived := string(b)
+	if xmlExpected != xmlReceived {
+		t.Fatalf("Ошибка Marshal. Ожидалось получить XML %s, получен XML %s", xmlExpected, xmlReceived)
+	}
+
+	var dtFromXML DateTime
+	if err := xml.Unmarshal(b, &dtFromXML); err != nil {
+		t.Fatal(err)
+	}
+	dtFromXMLString := dtFromXML.String()
+	if dtFromXMLString != dtString {
+		t.Fatalf("Ошибка Unmarshal. Ожидалось получить XML %s, получен XML %s", dtString, dtFromXMLString)
+	}
+}
+
 func TestDateTimeUnmarshalBadJSON(t *testing.T) {
 	b := []byte(`"wrong"`)
 	var dtFromJSON DateTime
@@ -299,6 +326,32 @@ func TestDateJSON(t *testing.T) {
 	dFromJSONString := dFromJSON.String()
 	if dFromJSONString != dString {
 		t.Fatalf("Ошибка Unmarshal. Ожидалось получить JSON %s, получен JSON %s", dString, dFromJSONString)
+	}
+}
+
+func TestDateXML(t *testing.T) {
+	dString := "2015-07-30"
+	xmlExpected := fmt.Sprintf("<Date>%s</Date>", dString)
+	d, err := StringToDate(dString)
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, err := xml.Marshal(d)
+	if err != nil {
+		t.Fatal(err)
+	}
+	xmlReceived := string(b)
+	if xmlExpected != xmlReceived {
+		t.Fatalf("Ошибка Marshal. Ожидалось получить XML %s, получен XML %s", xmlExpected, xmlReceived)
+	}
+
+	var dFromXML Date
+	if err := xml.Unmarshal(b, &dFromXML); err != nil {
+		t.Fatal(err)
+	}
+	dFromXMLString := dFromXML.String()
+	if dFromXMLString != dString {
+		t.Fatalf("Ошибка Unmarshal. Ожидалось получить XML %s, получен XML %s", dString, dFromXMLString)
 	}
 }
 
