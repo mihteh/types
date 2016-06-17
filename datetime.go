@@ -556,6 +556,43 @@ func (d NullDateTime) MarshalJSON() ([]byte, error) {
 	return []byte(strconv.Quote(d.String())), nil
 }
 
+// String преобразует объект NullDateTime в строку согласно шаблона в свойстве Layout
+func (d NullDateTime) String() string {
+	if !d.Valid {
+		return "null"
+	}
+	return d.DateTime.String()
+}
+
+// String преобразует объект NullDate в строку согласно шаблона в свойстве Layout
+func (d NullDate) String() string {
+	if !d.Valid {
+		return "null"
+	}
+	return d.Date.String()
+}
+
+/*// UnmarshalXML реализует интерфейс xml.Unmarshaler для объекта DateTime
+// десериализация происходит с учётом шаблона, заданного в свойстве Layout
+func (d *NullDateTime) UnmarshalXML(decoder *xml.Decoder, start xml.StartElement) error {
+	var content string
+	if err := decoder.DecodeElement(&content, &start); err != nil {
+		return err
+	}
+	d.fixLayout()
+	return parse(d, content)
+}
+
+// MarshalXML реализует интерфейс xml.Marshaler для объекта DateTime
+// сериализация происходит с учётом шаблона, заданного в свойстве Layout
+func (d NullDateTime) MarshalXML(encoder *xml.Encoder, start xml.StartElement) error {
+	if !d.Valid {
+		return encoder
+	}
+	d.fixLayout()
+	return encoder.EncodeElement(d.String(), start)
+}*/
+
 // MarshalJSON - реализует интерфейс json.Marshaler для объекта NullDate
 // сериализация происходит с учётом шаблона, заданного в свойстве Layout
 func (d NullDate) MarshalJSON() ([]byte, error) {

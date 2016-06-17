@@ -460,7 +460,7 @@ func TestNullableDateTime(t *testing.T) {
 	}
 	received := dt.Nullable()
 	if !reflect.DeepEqual(received, expected) {
-		t.Fatal("Не равны. Ожидаось: %v, получено: %v", expected, received)
+		t.Fatal("Не равны. Ожидалось: %v, получено: %v", expected, received)
 	}
 }
 
@@ -469,7 +469,25 @@ func TestNullableDate(t *testing.T) {
 	expected := NullDate{Date: d, Valid: true}
 	received := d.Nullable()
 	if !reflect.DeepEqual(received, expected) {
-		t.Fatal("Не равны. Ожидаось: %v, получено: %v", expected, received)
+		t.Fatal("Не равны. Ожидалось: %v, получено: %v", expected, received)
+	}
+}
+
+func TestDateStringIfNull(t *testing.T) {
+	d := MakeNullDate()
+	received := fmt.Sprint(d)
+	expected := "null"
+	if received != expected {
+		t.Fatal("Не равны. Ожидалось: %s, получено: %s", expected, received)
+	}
+}
+
+func TestDateTimeStringIfNull(t *testing.T) {
+	dt := MakeNullDateTime()
+	received := fmt.Sprint(dt)
+	expected := "null"
+	if received != expected {
+		t.Fatal("Не равны. Ожидалось: %s, получено: %s", expected, received)
 	}
 }
 
