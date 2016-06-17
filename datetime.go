@@ -444,6 +444,7 @@ func (d *NullDateTime) Scan(value interface{}) error {
 		d.Valid = false
 		return nil
 	}
+	d.Valid = true
 	return scan(value, d)
 }
 
@@ -464,6 +465,7 @@ func (d *NullDate) Scan(value interface{}) error {
 		d.Valid = false
 		return nil
 	}
+	d.Valid = true
 	return scan(value, d)
 }
 
