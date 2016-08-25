@@ -610,15 +610,15 @@ func TestMarshalUnmarshalXMLForNullDateTimeIfNotValid(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	expected := fmt.Sprintf("<NullDateTime></NullDateTime>")
-	received := string(xmlBytes)
-	if expected != received {
-		t.Fatalf("Неправильное отображение в XML. Ожидалось: %v, получено: %v", expected, received)
+	
+	//received := string(xmlBytes)
+	if xmlBytes != nil {
+		t.Fatalf("Неправильное отображение в XML. Ожидалось: nil получено: %v", xmlBytes)
 	}
 
 	var fromXML NullDateTime
-	if err := xml.Unmarshal([]byte(received), &fromXML); err != nil {
+	expected := fmt.Sprintf("<NullDateTime></NullDateTime>")
+	if err := xml.Unmarshal([]byte(expected), &fromXML); err != nil {
 		t.Fatal(err)
 	}
 	if fromXML.Valid {
@@ -656,14 +656,14 @@ func TestMarshalUnmarshalXMLForNullDateIfNotValid(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := fmt.Sprintf("<NullDate></NullDate>")
-	received := string(xmlBytes)
-	if expected != received {
-		t.Fatalf("Неправильное отображение в XML. Ожидалось: %v, получено: %v", expected, received)
+	//received := string(xmlBytes)
+	if xmlBytes != nil {
+		t.Fatalf("Неправильное отображение в XML. Ожидалось: nil, получено: %v", xmlBytes)
 	}
 
 	var fromXML NullDate
-	if err := xml.Unmarshal([]byte(received), &fromXML); err != nil {
+	expected := fmt.Sprintf("<NullDate></NullDate>")
+	if err := xml.Unmarshal([]byte(expected), &fromXML); err != nil {
 		t.Fatal(err)
 	}
 	if fromXML.Valid {

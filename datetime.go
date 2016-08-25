@@ -597,7 +597,7 @@ func (d *NullDateTime) UnmarshalXML(decoder *xml.Decoder, start xml.StartElement
 // сериализация происходит с учётом шаблона, заданного в свойстве Layout
 func (d NullDateTime) MarshalXML(encoder *xml.Encoder, start xml.StartElement) error {
 	if !d.Valid {
-		return encoder.EncodeElement("", start)
+		return encoder.EncodeElement(nil, start)
 	}
 	d.fixLayout()
 	return encoder.EncodeElement(d.String(), start)
@@ -626,7 +626,7 @@ func (d *NullDate) UnmarshalXML(decoder *xml.Decoder, start xml.StartElement) er
 // сериализация происходит с учётом шаблона, заданного в свойстве Layout
 func (d NullDate) MarshalXML(encoder *xml.Encoder, start xml.StartElement) error {
 	if !d.Valid {
-		return encoder.EncodeElement("", start)
+		return encoder.EncodeElement(nil, start)
 	}
 	d.fixLayout()
 	return encoder.EncodeElement(d.String(), start)
