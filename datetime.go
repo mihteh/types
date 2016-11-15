@@ -651,3 +651,15 @@ func MakeNullDate() NullDate {
 func MakeNullDateTime() NullDateTime {
 	return NullDateTime{Valid: false}
 }
+
+// OldNeverTime это устаревшая версия метода NeverTime()
+func OldNeverTime() DateTime {
+	t, _ := time.ParseInLocation(DateTimeLayout, "1990-01-01 00:00:00", defaultLocation)
+	return ToDateTime(t)
+}
+
+// OldNeverDate это устаревшая версия метода NeverDate()
+func OldNeverDate() Date {
+	t, _ := time.ParseInLocation(DateLayout, "1990-01-01", defaultLocation)
+	return ToDate(t)
+}
