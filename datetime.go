@@ -6,6 +6,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"net/url"
 	"strconv"
 	"time"
 )
@@ -322,6 +323,14 @@ func (d DateTime) MarshalJSON() ([]byte, error) {
 	return []byte(strconv.Quote(d.String())), nil
 }
 
+// EncodeValues реализует интерфейс query.Encoder для объекта DateTime
+// сериализация происходит с учётом шаблона, заданного в свойстве Layout
+func (d DateTime) EncodeValues(key string, v *url.Values) error {
+	d.fixLayout()
+	v.Set(key, d.String())
+	return nil
+}
+
 // UnmarshalXML реализует интерфейс xml.Unmarshaler для объекта DateTime
 // десериализация происходит с учётом шаблона, заданного в свойстве Layout
 func (d *DateTime) UnmarshalXML(decoder *xml.Decoder, start xml.StartElement) error {
@@ -351,6 +360,14 @@ func (d *Date) UnmarshalJSON(data []byte) error {
 func (d Date) MarshalJSON() ([]byte, error) {
 	d.fixLayout()
 	return []byte(strconv.Quote(d.String())), nil
+}
+
+// EncodeValues реализует интерфейс query.Encoder для объекта Date
+// сериализация происходит с учётом шаблона, заданного в свойстве Layout
+func (d Date) EncodeValues(key string, v *url.Values) error {
+	d.fixLayout()
+	v.Set(key, d.String())
+	return nil
 }
 
 // UnmarshalXML реализует интерфейс xml.Unmarshaler для объекта Date

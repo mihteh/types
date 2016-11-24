@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"github.com/google/go-querystring/query"
+	"net/url"
 	"reflect"
 	"testing"
 	"time"
@@ -610,7 +612,7 @@ func TestMarshalUnmarshalXMLForNullDateTimeIfNotValid(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	
+
 	//received := string(xmlBytes)
 	if xmlBytes != nil {
 		t.Fatalf("Неправильное отображение в XML. Ожидалось: nil получено: %v", xmlBytes)
@@ -668,5 +670,45 @@ func TestMarshalUnmarshalXMLForNullDateIfNotValid(t *testing.T) {
 	}
 	if fromXML.Valid {
 		t.Fatal("Valid == true, а должно быть false")
+	}
+}
+
+func TestDateTimeUrlEncode(t *testing.T) {
+	tm, err := time.Parse(DateTimeLayout, "2016-11-24 13:54:55")
+	if err != nil {
+		t.Fatal(err)
+	}
+	testStruct := struct {
+		Dt DateTime `url:"dt"`
+	}{Dt: ToDateTime(tm)}
+
+	expectedValues := url.Values{"dt": []string{"2016-11-24 13:54:55"}}
+	values, err := query.Values(testStruct)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(expectedValues, values) {
+		t.Fatalf("Ожидалось: %v, получено: %v", expectedValues, values)
+	}
+}
+
+func TestDateUrlEncode(t *testing.T) {
+	tm, err := time.Parse(DateLayout, "2016-11-24")
+	if err != nil {
+		t.Fatal(err)
+	}
+	testStruct := struct {
+		D Date `url:"d"`
+	}{D: ToDate(tm)}
+
+	expectedValues := url.Values{"d": []string{"2016-11-24"}}
+	values, err := query.Values(testStruct)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(expectedValues, values) {
+		t.Fatalf("Ожидалось: %v, получено: %v", expectedValues, values)
 	}
 }
