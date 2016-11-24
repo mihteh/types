@@ -575,6 +575,17 @@ func (d NullDateTime) MarshalJSON() ([]byte, error) {
 	return []byte(strconv.Quote(d.String())), nil
 }
 
+// EncodeValues реализует интерфейс query.Encoder для объекта NullDateTime
+// сериализация происходит с учётом шаблона, заданного в свойстве Layout
+func (d NullDateTime) EncodeValues(key string, v *url.Values) error {
+	if !d.Valid {
+		return nil
+	}
+	d.fixLayout()
+	v.Set(key, d.String())
+	return nil
+}
+
 // String преобразует объект NullDateTime в строку согласно шаблона в свойстве Layout
 func (d NullDateTime) String() string {
 	if !d.Valid {
@@ -657,6 +668,17 @@ func (d NullDate) MarshalJSON() ([]byte, error) {
 	}
 	d.fixLayout()
 	return []byte(strconv.Quote(d.String())), nil
+}
+
+// EncodeValues реализует интерфейс query.Encoder для объекта NullDate
+// сериализация происходит с учётом шаблона, заданного в свойстве Layout
+func (d NullDate) EncodeValues(key string, v *url.Values) error {
+	if !d.Valid {
+		return nil
+	}
+	d.fixLayout()
+	v.Set(key, d.String())
+	return nil
 }
 
 // MakeNullDate возвразает NullDate со значением NULL

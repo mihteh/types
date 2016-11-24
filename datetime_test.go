@@ -712,3 +712,75 @@ func TestDateUrlEncode(t *testing.T) {
 		t.Fatalf("Ожидалось: %v, получено: %v", expectedValues, values)
 	}
 }
+
+func TestNullDateTimeUrlEncodeIfValid(t *testing.T) {
+	tm, err := time.Parse(DateTimeLayout, "2016-11-24 13:54:55")
+	if err != nil {
+		t.Fatal(err)
+	}
+	testStruct := struct {
+		Dt NullDateTime `url:"dt"`
+	}{Dt: ToDateTime(tm).Nullable()}
+
+	expectedValues := url.Values{"dt": []string{"2016-11-24 13:54:55"}}
+	values, err := query.Values(testStruct)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(expectedValues, values) {
+		t.Fatalf("Ожидалось: %v, получено: %v", expectedValues, values)
+	}
+}
+
+func TestNullDateUrlEncodeIfValid(t *testing.T) {
+	tm, err := time.Parse(DateLayout, "2016-11-24")
+	if err != nil {
+		t.Fatal(err)
+	}
+	testStruct := struct {
+		D NullDate `url:"d"`
+	}{D: ToDate(tm).Nullable()}
+
+	expectedValues := url.Values{"d": []string{"2016-11-24"}}
+	values, err := query.Values(testStruct)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(expectedValues, values) {
+		t.Fatalf("Ожидалось: %v, получено: %v", expectedValues, values)
+	}
+}
+
+func TestNullDateTimeUrlEncodeIfNotValid(t *testing.T) {
+	testStruct := struct {
+		Dt NullDateTime `url:"dt"`
+	}{Dt: MakeNullDateTime()}
+
+	expectedValues := url.Values{}
+	values, err := query.Values(testStruct)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(expectedValues, values) {
+		t.Fatalf("Ожидалось: %v, получено: %v", expectedValues, values)
+	}
+}
+
+func TestNullDateUrlEncodeIfNotValid(t *testing.T) {
+	testStruct := struct {
+		D NullDate `url:"d"`
+	}{D: MakeNullDate()}
+
+	expectedValues := url.Values{}
+	values, err := query.Values(testStruct)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(expectedValues, values) {
+		t.Fatalf("Ожидалось: %v, получено: %v", expectedValues, values)
+	}
+}
