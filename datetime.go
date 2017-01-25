@@ -70,7 +70,12 @@ func ToDateTime(t time.Time) DateTime {
 // DateTimeFromNow adds given amount of years, months, days and time.Duration to now
 // and returns a constructed DateTime object
 func DateTimeFromNow(years, months, days int, duration time.Duration) DateTime {
-	return ToDateTime(time.Now().AddDate(years, months, days).Add(duration))
+	return DateTimeNow().Add(years, months, days, duration)
+}
+
+// Add adds given amount of years, months, days and time.Duration to dt and returns a result
+func (dt DateTime) Add(years, months, days int, duration time.Duration) DateTime {
+	return ToDateTime(dt.AddDate(years, months, days).Add(duration))
 }
 
 // ToDate формирует объект типа Date на основе времени t и шаблона DateLayout
@@ -85,7 +90,12 @@ func ToDate(t time.Time) Date {
 // DateFromNow adds given amount of years, months and days to now
 // and returns a constructed Date object
 func DateFromNow(years, months, days int) Date {
-	return ToDate(time.Now().AddDate(years, months, days))
+	return DateNow().Add(years, months, days)
+}
+
+// Add adds given amount of years, months and days to d and returns a result
+func (d Date) Add(years, months, days int) Date {
+	return ToDate(d.AddDate(years, months, days))
 }
 
 // DaysBefore возвращает количество полных дней, прошедших от d до endDate
