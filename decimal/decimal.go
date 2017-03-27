@@ -75,6 +75,15 @@ func New(value int64, exp int32) Decimal {
 	}
 }
 
+// N is a convenience function for NewFromString(), also it panic if value is invalid
+func N(value string) Decimal {
+	d, err := NewFromString(value)
+	if err != nil {
+		panic(err)
+	}
+	return d
+}
+
 // NewFromString returns a new Decimal from a string representation.
 //
 // Example:
