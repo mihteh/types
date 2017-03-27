@@ -92,6 +92,11 @@ func F(value float64) Decimal {
 	return NewFromFloat(value)
 }
 
+// P returns a pointer to d
+func (d Decimal) P() *Decimal {
+	return &d
+}
+
 // SetStringPrecision sets the precision for string output in Marshaler interfaces
 func SetStringPrecision(value int32) {
 	stringPrecision = value
