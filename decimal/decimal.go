@@ -43,6 +43,9 @@ import (
 //
 var DivisionPrecision = 16
 
+// stringPrecision is the number of decimal places in string result for Marshaler interfaces
+var stringPrecision = 2
+
 // Zero constant, to make computations faster.
 var Zero = New(0, 1)
 
@@ -82,6 +85,11 @@ func N(value string) Decimal {
 		panic(err)
 	}
 	return d
+}
+
+// SetStringPrecision sets the precision for string output in Marshaler interfaces
+func SetStringPrecision(value int) {
+	stringPrecision = value
 }
 
 // NewFromString returns a new Decimal from a string representation.
@@ -481,7 +489,7 @@ func (d *Decimal) UnmarshalJSON(decimalBytes []byte) error {
 
 // MarshalJSON implements the json.Marshaler interface.
 func (d Decimal) MarshalJSON() ([]byte, error) {
-	return []byte(d.StringFixed(2)), nil
+	return []byte(d.StringFixed(stringPrecision)), nil
 }
 
 // Scan implements the sql.Scanner interface for database deserialization.
@@ -517,7 +525,7 @@ func (d *Decimal) UnmarshalText(text []byte) error {
 // MarshalText implements the encoding.TextMarshaler interface for XML
 // serialization.
 func (d Decimal) MarshalText() (text []byte, err error) {
-	return []byte(d.StringFixed(2)), nil
+	return []byte(d.StringFixed(stringPrecision)), nil
 }
 
 // NOTE: buggy, unintuitive, and DEPRECATED! Use StringFixed instead.
