@@ -44,7 +44,7 @@ import (
 var DivisionPrecision = 16
 
 // stringPrecision is the number of decimal places in string result for Marshaler interfaces
-var stringPrecision = 2
+var stringPrecision int32 = 2
 
 // Zero constant, to make computations faster.
 var Zero = New(0, 1)
@@ -88,7 +88,7 @@ func N(value string) Decimal {
 }
 
 // SetStringPrecision sets the precision for string output in Marshaler interfaces
-func SetStringPrecision(value int) {
+func SetStringPrecision(value int32) {
 	stringPrecision = value
 }
 
