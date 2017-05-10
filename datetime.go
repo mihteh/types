@@ -253,9 +253,9 @@ func (d DateTime) ConvertToDate() Date {
 // с учётом заданных часов, минут, секунд в параметрах hours, mind, secs соответственно.
 func (d Date) ConvertToDateTimeHMS(hours int, mins int, secs int) DateTime {
 	dt := NewDateTime()
-	dt.Layout = d.Layout
 	dt.setTime(d.Time)
 	dt = dt.SetHMS(hours, mins, secs)
+	dt.Layout = DateTimeLayout
 	return dt
 }
 
