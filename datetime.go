@@ -327,8 +327,19 @@ func (d DateTime) Equal(d1 DateTime) bool {
 
 // parse устанавливает время в объекте, реализующем интерфейс timeModifier
 // на основе строки s и Location defaultLocation
-func parse(d timeModifier, s string) error {
-	t, err := time.ParseInLocation(d.getLayout(), s, defaultLocation)
+func parse(d timeModifier, s interface{}) error {
+	var t time.Time
+	var err error
+	switch s.(type) {
+	case string: // из строки
+		t, err = time.ParseInLocation(d.getLayout(), s.(string), defaultLocation)
+	case float64: // из timestamp UTC
+		f, err := strconv.ParseFloat(fmt.Sprintf("%f", s.(float64)/1000), 64)
+		if err != nil {
+			return err
+		}
+		t = time.Unix(int64(f), 0)
+	}
 	if err == nil {
 		d.setTime(t)
 	}
@@ -336,11 +347,12 @@ func parse(d timeModifier, s string) error {
 }
 
 func unmarshalJSON(data []byte, to timeModifier) error {
-	var s string
+	var s interface{}
 	to.fixLayout()
 	if err := json.Unmarshal(data, &s); err != nil {
 		return err
 	}
+
 	return parse(to, s)
 }
 
@@ -376,7 +388,16 @@ func (d *DateTime) UnmarshalXML(decoder *xml.Decoder, start xml.StartElement) er
 		return err
 	}
 	d.fixLayout()
-	return parse(d, content)
+
+	var iContent interface{}
+	iContent = content
+
+	f, err := strconv.ParseFloat(content, 64)
+	if err == nil {
+		iContent = f
+	}
+
+	return parse(d, iContent)
 }
 
 // MarshalXML реализует интерфейс xml.Marshaler для объекта DateTime
@@ -421,7 +442,16 @@ func (d *Date) UnmarshalXML(decoder *xml.Decoder, start xml.StartElement) error 
 		return err
 	}
 	d.fixLayout()
-	return parse(d, content)
+
+	var iContent interface{}
+	iContent = content
+
+	f, err := strconv.ParseFloat(content, 64)
+	if err == nil {
+		iContent = f
+	}
+
+	return parse(d, iContent)
 }
 
 // MarshalXML реализует интерфейс xml.Marshaler для объекта Date
@@ -618,7 +648,7 @@ func (d NullDateTime) MarshalJSON() ([]byte, error) {
 		return []byte("null"), nil
 	}
 	d.fixLayout()
-	return []byte(strconv.Quote(d.String())), nil
+	return d.DateTime.MarshalJSON()
 }
 
 // EncodeValues реализует интерфейс query.Encoder для объекта NullDateTime
@@ -659,9 +689,19 @@ func (d *NullDateTime) UnmarshalXML(decoder *xml.Decoder, start xml.StartElement
 		d.Valid = false
 		return nil
 	}
+
+	var iContent interface{}
+	iContent = content
+
 	pobj := &DateTime{}
 	pobj.fixLayout()
-	err := parse(pobj, content)
+
+	f, err := strconv.ParseFloat(content, 64)
+	if err == nil {
+		iContent = f
+	}
+
+	err = parse(pobj, iContent)
 	d.DateTime = *pobj
 	d.Valid = err == nil
 	return err
@@ -674,7 +714,7 @@ func (d NullDateTime) MarshalXML(encoder *xml.Encoder, start xml.StartElement) e
 		return encoder.EncodeElement(nil, start)
 	}
 	d.fixLayout()
-	return encoder.EncodeElement(d.String(), start)
+	return d.DateTime.MarshalXML(encoder, start)
 }
 
 // UnmarshalXML реализует интерфейс xml.Unmarshaler для объекта NullDate
@@ -688,9 +728,19 @@ func (d *NullDate) UnmarshalXML(decoder *xml.Decoder, start xml.StartElement) er
 		d.Valid = false
 		return nil
 	}
+
+	var iContent interface{}
+	iContent = content
+
 	pobj := &Date{}
 	pobj.fixLayout()
-	err := parse(pobj, content)
+
+	f, err := strconv.ParseFloat(content, 64)
+	if err == nil {
+		iContent = f
+	}
+
+	err = parse(pobj, iContent)
 	d.Date = *pobj
 	d.Valid = err == nil
 	return err
@@ -703,7 +753,7 @@ func (d NullDate) MarshalXML(encoder *xml.Encoder, start xml.StartElement) error
 		return encoder.EncodeElement(nil, start)
 	}
 	d.fixLayout()
-	return encoder.EncodeElement(d.String(), start)
+	return d.Date.MarshalXML(encoder, start)
 }
 
 // MarshalJSON - реализует интерфейс json.Marshaler для объекта NullDate
@@ -713,7 +763,7 @@ func (d NullDate) MarshalJSON() ([]byte, error) {
 		return []byte("null"), nil
 	}
 	d.fixLayout()
-	return []byte(strconv.Quote(d.String())), nil
+	return d.Date.MarshalJSON()
 }
 
 // EncodeValues реализует интерфейс query.Encoder для объекта NullDate
