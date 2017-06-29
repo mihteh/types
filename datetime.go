@@ -14,15 +14,15 @@ import (
 // DateTime хранит дату-время и шаблон для преобразования при сериализации
 type DateTime struct {
 	time.Time
-	Layout string
-	marshalToTimeStamp bool
+	Layout                string
+	marshalToUTCTimeStamp bool
 }
 
 // Date хранит дату и шаблон для преобразования при сериализации
 type Date struct {
 	time.Time
-	Layout string
-	marshalToTimeStamp bool
+	Layout                string
+	marshalToUTCTimeStamp bool
 }
 
 type timeModifier interface {
@@ -204,14 +204,14 @@ func (d *Date) setLayout(layout string) {
 	d.Layout = layout
 }
 
-// SetMarshalToTimeStamp устанавливает поле marshalToTimeStamp
-func (d *Date) SetMarshalToTimeStamp(flag bool) {
-	d.marshalToTimeStamp = flag
+// SetMarshalToUTCTimeStamp устанавливает поле marshalToUTCTimeStamp
+func (d *Date) SetMarshalToUTCTimeStamp(flag bool) {
+	d.marshalToUTCTimeStamp = flag
 }
 
-// SetMarshalToTimeStamp устанавливает поле marshalToTimeStamp
-func (dt *DateTime) SetMarshalToTimeStamp(flag bool) {
-	dt.marshalToTimeStamp = flag
+// SetMarshalToUTCTimeStamp устанавливает поле marshalToUTCTimeStamp
+func (dt *DateTime) SetMarshalToUTCTimeStamp(flag bool) {
+	dt.marshalToUTCTimeStamp = flag
 }
 
 // fixLayout устанавливает Layout в объекте Date на DateLayout если он не определён
@@ -354,7 +354,7 @@ func (d *DateTime) UnmarshalJSON(data []byte) error {
 // сериализация происходит с учётом шаблона, заданного в свойстве Layout
 func (d DateTime) MarshalJSON() ([]byte, error) {
 	d.fixLayout()
-	if d.marshalToTimeStamp {
+	if d.marshalToUTCTimeStamp {
 		return []byte(fmt.Sprintf("%d", d.Time.UTC().Unix()*1000)), nil
 	}
 	return []byte(strconv.Quote(d.String())), nil
@@ -383,7 +383,7 @@ func (d *DateTime) UnmarshalXML(decoder *xml.Decoder, start xml.StartElement) er
 // сериализация происходит с учётом шаблона, заданного в свойстве Layout
 func (d DateTime) MarshalXML(encoder *xml.Encoder, start xml.StartElement) error {
 	d.fixLayout()
-	if d.marshalToTimeStamp {
+	if d.marshalToUTCTimeStamp {
 		return encoder.EncodeElement(fmt.Sprintf("%d", d.Time.UTC().Unix()*1000), start)
 	}
 	return encoder.EncodeElement(d.String(), start)
@@ -399,7 +399,7 @@ func (d *Date) UnmarshalJSON(data []byte) error {
 // сериализация происходит с учётом шаблона, заданного в свойстве Layout
 func (d Date) MarshalJSON() ([]byte, error) {
 	d.fixLayout()
-	if d.marshalToTimeStamp {
+	if d.marshalToUTCTimeStamp {
 		return []byte(fmt.Sprintf("%d", d.Time.UTC().Unix()*1000)), nil
 	}
 	return []byte(strconv.Quote(d.String())), nil
@@ -428,7 +428,7 @@ func (d *Date) UnmarshalXML(decoder *xml.Decoder, start xml.StartElement) error 
 // сериализация происходит с учётом шаблона, заданного в свойстве Layout
 func (d Date) MarshalXML(encoder *xml.Encoder, start xml.StartElement) error {
 	d.fixLayout()
-	if d.marshalToTimeStamp {
+	if d.marshalToUTCTimeStamp {
 		return encoder.EncodeElement(fmt.Sprintf("%d", d.Time.UTC().Unix()*1000), start)
 	}
 	return encoder.EncodeElement(d.String(), start)
