@@ -48,6 +48,9 @@ const (
 	GraphsDateShortLayout = "02.01"
 )
 
+// timeStampMultiplier множитель для timeStamp
+const timeStampMultiplier = 1e3
+
 // defaultLocation хранит значение по умолчанию для Location
 var defaultLocation *time.Location
 
@@ -334,7 +337,7 @@ func parse(d timeModifier, s interface{}) error {
 	case string: // из строки
 		t, err = time.ParseInLocation(d.getLayout(), s.(string), defaultLocation)
 	case float64: // из timestamp UTC
-		f, err := strconv.ParseFloat(fmt.Sprintf("%f", s.(float64)/1000), 64)
+		f, err := strconv.ParseFloat(fmt.Sprintf("%f", s.(float64)/timeStampMultiplier), 64)
 		if err != nil {
 			return err
 		}
@@ -367,7 +370,7 @@ func (d *DateTime) UnmarshalJSON(data []byte) error {
 func (d DateTime) MarshalJSON() ([]byte, error) {
 	d.fixLayout()
 	if d.marshalToUTCTimeStamp {
-		return []byte(fmt.Sprintf("%d", d.Time.UTC().Unix()*1000)), nil
+		return []byte(fmt.Sprintf("%d", d.Time.Unix()*timeStampMultiplier)), nil
 	}
 	return []byte(strconv.Quote(d.String())), nil
 }
@@ -405,7 +408,7 @@ func (d *DateTime) UnmarshalXML(decoder *xml.Decoder, start xml.StartElement) er
 func (d DateTime) MarshalXML(encoder *xml.Encoder, start xml.StartElement) error {
 	d.fixLayout()
 	if d.marshalToUTCTimeStamp {
-		return encoder.EncodeElement(fmt.Sprintf("%d", d.Time.UTC().Unix()*1000), start)
+		return encoder.EncodeElement(fmt.Sprintf("%d", d.Time.Unix()*timeStampMultiplier), start)
 	}
 	return encoder.EncodeElement(d.String(), start)
 }
@@ -421,7 +424,7 @@ func (d *Date) UnmarshalJSON(data []byte) error {
 func (d Date) MarshalJSON() ([]byte, error) {
 	d.fixLayout()
 	if d.marshalToUTCTimeStamp {
-		return []byte(fmt.Sprintf("%d", d.Time.UTC().Unix()*1000)), nil
+		return []byte(fmt.Sprintf("%d", d.Time.Unix()*timeStampMultiplier)), nil
 	}
 	return []byte(strconv.Quote(d.String())), nil
 }
@@ -459,7 +462,7 @@ func (d *Date) UnmarshalXML(decoder *xml.Decoder, start xml.StartElement) error 
 func (d Date) MarshalXML(encoder *xml.Encoder, start xml.StartElement) error {
 	d.fixLayout()
 	if d.marshalToUTCTimeStamp {
-		return encoder.EncodeElement(fmt.Sprintf("%d", d.Time.UTC().Unix()*1000), start)
+		return encoder.EncodeElement(fmt.Sprintf("%d", d.Time.Unix()*timeStampMultiplier), start)
 	}
 	return encoder.EncodeElement(d.String(), start)
 }

@@ -273,11 +273,11 @@ func TestDateTimeJSON(t *testing.T) {
 
 func TestDateTimeJSONIfTimeStamp(t *testing.T) {
 	dtString := "2015-07-30 20:58:59"
-	jsonExpected := `1438279139000`
 	dt, err := StringToDateTime(dtString)
 	if err != nil {
 		t.Fatal(err)
 	}
+	jsonExpected := fmt.Sprintf("%d", dt.Unix()*timeStampMultiplier)
 
 	dt.SetMarshalToUTCTimeStamp(true) // marshal to timestamp
 	b, err := json.Marshal(dt)
@@ -327,11 +327,11 @@ func TestDateTimeXML(t *testing.T) {
 
 func TestDateTimeXMLIfTimeStamp(t *testing.T) {
 	dtString := "2015-07-30 20:58:59"
-	xmlExpected := fmt.Sprintf("<DateTime>%d</DateTime>", 1438279139000)
 	dt, err := StringToDateTime(dtString)
 	if err != nil {
 		t.Fatal(err)
 	}
+	xmlExpected := fmt.Sprintf("<DateTime>%d</DateTime>", dt.Unix()*timeStampMultiplier)
 
 	dt.SetMarshalToUTCTimeStamp(true) // marshal to timestamp
 	b, err := xml.Marshal(dt)
@@ -389,11 +389,11 @@ func TestDateJSON(t *testing.T) {
 
 func TestDateJSONIfTimeStamp(t *testing.T) {
 	dString := "2015-07-30"
-	jsonExpected := `1438203600000`
 	d, err := StringToDate(dString)
 	if err != nil {
 		t.Fatal(err)
 	}
+	jsonExpected := fmt.Sprintf("%d", d.Unix()*timeStampMultiplier)
 
 	d.SetMarshalToUTCTimeStamp(true) // marshal to timestamp
 	b, err := json.Marshal(d)
@@ -443,11 +443,11 @@ func TestDateXML(t *testing.T) {
 
 func TestDateXMLIfTimeStamp(t *testing.T) {
 	dString := "2015-07-30"
-	xmlExpected := fmt.Sprintf("<Date>%d</Date>", 1438203600000)
 	d, err := StringToDate(dString)
 	if err != nil {
 		t.Fatal(err)
 	}
+	xmlExpected := fmt.Sprintf("<Date>%d</Date>", d.Unix()*timeStampMultiplier)
 
 	d.SetMarshalToUTCTimeStamp(true) // marshal to timestamp
 	b, err := xml.Marshal(d)
@@ -455,6 +455,7 @@ func TestDateXMLIfTimeStamp(t *testing.T) {
 		t.Fatal(err)
 	}
 	xmlReceived := string(b)
+	fmt.Println(">>>", xmlReceived)
 	if xmlExpected != xmlReceived {
 		t.Fatalf("Ошибка Marshal. Ожидалось получить XML %s, получен XML %s", xmlExpected, xmlReceived)
 	}
