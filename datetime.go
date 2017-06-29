@@ -338,7 +338,7 @@ func parse(d timeModifier, s interface{}) error {
 		if err != nil {
 			return err
 		}
-		t = time.Unix(int64(f), 0).In(defaultLocation)
+		t = time.Unix(int64(f), 0)
 	}
 	if err == nil {
 		d.setTime(t)
