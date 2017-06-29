@@ -52,7 +52,7 @@ var defaultLocation *time.Location
 // Задаёт часовой пояс по умолчанию
 func init() {
 	var err error
-	defaultLocation, err = time.LoadLocation("Europe/Moscow")
+	defaultLocation, err = time.LoadLocation("Local")
 	if err != nil {
 		fmt.Println("Ошибка time.LoadLocation")
 	}
