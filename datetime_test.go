@@ -271,6 +271,34 @@ func TestDateTimeJSON(t *testing.T) {
 	}
 }
 
+func TestDateTimeJSONIfTimeStamp(t *testing.T) {
+	dtString := "2015-07-30 20:58:59"
+	dt, err := StringToDateTime(dtString)
+	if err != nil {
+		t.Fatal(err)
+	}
+	jsonExpected := fmt.Sprintf("%d", dt.Unix()*timeStampMultiplier)
+
+	dt.SetMarshalToUTCTimeStamp(true) // marshal to timestamp
+	b, err := json.Marshal(dt)
+	if err != nil {
+		t.Fatal(err)
+	}
+	jsonReceived := string(b)
+	if jsonExpected != jsonReceived {
+		t.Fatalf("Ошибка Marshal. Ожидалось получить JSON %s, получен JSON %s", jsonExpected, jsonReceived)
+	}
+
+	var dtFromJSON DateTime
+	if err := json.Unmarshal(b, &dtFromJSON); err != nil {
+		t.Fatal(err)
+	}
+	dtFromJSONString := dtFromJSON.String()
+	if dtFromJSONString != dtString {
+		t.Fatalf("Ошибка Unmarshal. Ожидалось получить JSON %s, получен JSON %s", dtString, dtFromJSONString)
+	}
+}
+
 func TestDateTimeXML(t *testing.T) {
 	dtString := "2015-07-30 20:58:59"
 	xmlExpected := fmt.Sprintf("<DateTime>%s</DateTime>", dtString)
@@ -278,6 +306,34 @@ func TestDateTimeXML(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	b, err := xml.Marshal(dt)
+	if err != nil {
+		t.Fatal(err)
+	}
+	xmlReceived := string(b)
+	if xmlExpected != xmlReceived {
+		t.Fatalf("Ошибка Marshal. Ожидалось получить XML %s, получен XML %s", xmlExpected, xmlReceived)
+	}
+
+	var dtFromXML DateTime
+	if err := xml.Unmarshal(b, &dtFromXML); err != nil {
+		t.Fatal(err)
+	}
+	dtFromXMLString := dtFromXML.String()
+	if dtFromXMLString != dtString {
+		t.Fatalf("Ошибка Unmarshal. Ожидалось получить XML %s, получен XML %s", dtString, dtFromXMLString)
+	}
+}
+
+func TestDateTimeXMLIfTimeStamp(t *testing.T) {
+	dtString := "2015-07-30 20:58:59"
+	dt, err := StringToDateTime(dtString)
+	if err != nil {
+		t.Fatal(err)
+	}
+	xmlExpected := fmt.Sprintf("<DateTime>%d</DateTime>", dt.Unix()*timeStampMultiplier)
+
+	dt.SetMarshalToUTCTimeStamp(true) // marshal to timestamp
 	b, err := xml.Marshal(dt)
 	if err != nil {
 		t.Fatal(err)
@@ -331,6 +387,34 @@ func TestDateJSON(t *testing.T) {
 	}
 }
 
+func TestDateJSONIfTimeStamp(t *testing.T) {
+	dString := "2015-07-30"
+	d, err := StringToDate(dString)
+	if err != nil {
+		t.Fatal(err)
+	}
+	jsonExpected := fmt.Sprintf("%d", d.Unix()*timeStampMultiplier)
+
+	d.SetMarshalToUTCTimeStamp(true) // marshal to timestamp
+	b, err := json.Marshal(d)
+	if err != nil {
+		t.Fatal(err)
+	}
+	jsonReceived := string(b)
+	if jsonExpected != jsonReceived {
+		t.Fatalf("Ошибка Marshal. Ожидалось получить JSON %s, получен JSON %s", jsonExpected, jsonReceived)
+	}
+
+	var dFromJSON Date
+	if err := json.Unmarshal(b, &dFromJSON); err != nil {
+		t.Fatal(err)
+	}
+	dFromJSONString := dFromJSON.String()
+	if dFromJSONString != dString {
+		t.Fatalf("Ошибка Unmarshal. Ожидалось получить JSON %s, получен JSON %s", dString, dFromJSONString)
+	}
+}
+
 func TestDateXML(t *testing.T) {
 	dString := "2015-07-30"
 	xmlExpected := fmt.Sprintf("<Date>%s</Date>", dString)
@@ -343,6 +427,35 @@ func TestDateXML(t *testing.T) {
 		t.Fatal(err)
 	}
 	xmlReceived := string(b)
+	if xmlExpected != xmlReceived {
+		t.Fatalf("Ошибка Marshal. Ожидалось получить XML %s, получен XML %s", xmlExpected, xmlReceived)
+	}
+
+	var dFromXML Date
+	if err := xml.Unmarshal(b, &dFromXML); err != nil {
+		t.Fatal(err)
+	}
+	dFromXMLString := dFromXML.String()
+	if dFromXMLString != dString {
+		t.Fatalf("Ошибка Unmarshal. Ожидалось получить XML %s, получен XML %s", dString, dFromXMLString)
+	}
+}
+
+func TestDateXMLIfTimeStamp(t *testing.T) {
+	dString := "2015-07-30"
+	d, err := StringToDate(dString)
+	if err != nil {
+		t.Fatal(err)
+	}
+	xmlExpected := fmt.Sprintf("<Date>%d</Date>", d.Unix()*timeStampMultiplier)
+
+	d.SetMarshalToUTCTimeStamp(true) // marshal to timestamp
+	b, err := xml.Marshal(d)
+	if err != nil {
+		t.Fatal(err)
+	}
+	xmlReceived := string(b)
+	fmt.Println(">>>", xmlReceived)
 	if xmlExpected != xmlReceived {
 		t.Fatalf("Ошибка Marshal. Ожидалось получить XML %s, получен XML %s", xmlExpected, xmlReceived)
 	}
