@@ -54,8 +54,13 @@ var oneInt = big.NewInt(1)
 var fiveInt = big.NewInt(5)
 var tenInt = big.NewInt(10)
 
-// constant for ~ comparison
-var val10em2 = NewFromFloat(0.00999999999)
+// comparePrecision is a constant for ~ comparison, it have the following default value
+var comparePrecision = NewFromFloat(0.00999999999)
+
+// SetComparePrecision sets the compare precision
+func SetComparePrecision(precision float64) {
+	comparePrecision = NewFromFloat(precision)
+}
 
 // Decimal represents a fixed-point decimal. It is immutable.
 // number = value * 10 ^ exp
@@ -657,60 +662,42 @@ func unquoteIfQuoted(value interface{}) (string, error) {
 	return string(bytes), nil
 }
 
-/*
-	Возвращает true если d > d2 более чем на 10e-2
-*/
+// Gt returns true id d > d2 with precision comparePrecision
 func (d Decimal) Gt(d2 Decimal) bool {
-	if d.Sub(d2).Cmp(val10em2) == 1 {
-		return true
-	}
-	return false
+	return d.Sub(d2).Cmp(comparePrecision) == 1
 }
 
-/*
-	Возвращает true если d >= d2 более чем на 10e-2
-*/
+// Ge returns true id d >= d2 with precision comparePrecision
 func (d Decimal) Ge(d2 Decimal) bool {
 	return d.Gt(d2) || d.Eq(d2)
 }
 
-/*
-	Возвращает true если d < d2 более чем на 10e-2
-*/
+// Lt returns true id d < d2 with precision comparePrecision
 func (d Decimal) Lt(d2 Decimal) bool {
-	if d2.Sub(d).Cmp(val10em2) == 1 {
-		return true
-	}
-	return false
+	return d2.Sub(d).Cmp(comparePrecision) == 1
 }
 
-/*
-	Возвращает true если d ~ d2 в порядке 10e-2
-*/
+// Eq returns true id d == d2 with precision comparePrecision
 func (d Decimal) Eq(d2 Decimal) bool {
-	if d.Sub(d2).Abs().Cmp(val10em2) == -1 {
-		return true
-	}
-	return false
+	return d.Sub(d2).Abs().Cmp(comparePrecision) == -1
 }
 
-/*
-	Возвращает true если d !~ d2 в порядке 10e-2
-*/
+// Ne returns true id d != d2 with precision comparePrecision
 func (d Decimal) Ne(d2 Decimal) bool {
 	return !d.Eq(d2)
 }
 
-/*
-	Возвращает true если d <= d2 более чем на 10e-2
-*/
+// Le returns true id d <= d2 with precision comparePrecision
 func (d Decimal) Le(d2 Decimal) bool {
 	return d.Lt(d2) || d.Eq(d2)
 }
 
-/*
-	Возвращает -d
-*/
+// Neg returns -d
 func (d Decimal) Neg() Decimal {
 	return Zero.Sub(d)
+}
+
+// Copy copies d and returns the copy
+func (d Decimal) Copy() Decimal {
+	return d.Add(Zero)
 }
