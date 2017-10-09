@@ -207,7 +207,7 @@ func (d *Date) setLayout(layout string) {
 	d.Layout = layout
 }
 
-// UTC returns date with location set to UTC
+// UTC returns date in UTC interpreting it as default location
 func (d Date) UTC() Date {
 	newDate := ToDate(d.Time.UTC())
 	newDate.Layout = d.Layout
@@ -219,7 +219,7 @@ func (d *Date) SetMarshalToUTCTimeStamp(flag bool) {
 	d.marshalToUTCTimeStamp = flag
 }
 
-// UTC returns datetime with location set to UTC
+// UTC returns datetime in UTC interpreting it as default location
 func (dt DateTime) UTC() DateTime {
 	newDateTime := ToDateTime(dt.Time.UTC())
 	newDateTime.Layout = dt.Layout
