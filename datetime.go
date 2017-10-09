@@ -209,8 +209,9 @@ func (d *Date) setLayout(layout string) {
 
 // UTC returns date with location set to UTC
 func (d Date) UTC() Date {
-	d.Time = d.Time.UTC()
-	return d
+	newDate := ToDate(d.Time.UTC())
+	newDate.Layout = d.Layout
+	return newDate
 }
 
 // SetMarshalToUTCTimeStamp устанавливает поле marshalToUTCTimeStamp
@@ -220,8 +221,9 @@ func (d *Date) SetMarshalToUTCTimeStamp(flag bool) {
 
 // UTC returns datetime with location set to UTC
 func (dt DateTime) UTC() DateTime {
-	dt.Time = dt.Time.UTC()
-	return dt
+	newDateTime := ToDateTime(dt.Time.UTC())
+	newDateTime.Layout = dt.Layout
+	return newDateTime
 }
 
 // SetMarshalToUTCTimeStamp устанавливает поле marshalToUTCTimeStamp
