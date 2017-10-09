@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"reflect"
 	"strconv"
 	"strings"
 )
@@ -509,12 +510,22 @@ func (d Decimal) MarshalJSON() ([]byte, error) {
 
 // Scan implements the sql.Scanner interface for database deserialization.
 func (d *Decimal) Scan(value interface{}) error {
-	str, err := unquoteIfQuoted(value)
-	if err != nil {
-		return err
+	kind := reflect.TypeOf(value).Kind()
+	var err error
+	switch kind {
+	case reflect.Int64:
+		*d, err = NewFromString(fmt.Sprintf("%d", value.(int64)))
+	case reflect.Float64:
+		*d = NewFromFloat(value.(float64))
+	case reflect.Slice:
+		str, err := unquoteIfQuoted(value)
+		if err != nil {
+			return err
+		}
+		*d, err = NewFromString(str)
+	default:
+		return fmt.Errorf("Decimal.Scan(): invalid value Kind(): %s", kind)
 	}
-	*d, err = NewFromString(str)
-
 	return err
 }
 
