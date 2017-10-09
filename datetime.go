@@ -207,9 +207,19 @@ func (d *Date) setLayout(layout string) {
 	d.Layout = layout
 }
 
+// SetLocationToUTC sets location of underlying time.Time to UTC
+func (d *Date) SetLocationToUTC() {
+	d.Time = d.Time.UTC()
+}
+
 // SetMarshalToUTCTimeStamp устанавливает поле marshalToUTCTimeStamp
 func (d *Date) SetMarshalToUTCTimeStamp(flag bool) {
 	d.marshalToUTCTimeStamp = flag
+}
+
+// SetLocationToUTC sets location of underlying time.Time to UTC
+func (t *DateTime) SetLocationToUTC() {
+	t.Time = t.Time.UTC()
 }
 
 // SetMarshalToUTCTimeStamp устанавливает поле marshalToUTCTimeStamp
