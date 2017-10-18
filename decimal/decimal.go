@@ -718,34 +718,57 @@ func (d Decimal) Copy() Decimal {
 	return d.Add(Zero)
 }
 
+// AddF returns d + f.
 func (d Decimal) AddF(f float64) Decimal {
 	return d.Add(F(f))
 }
 
+// SubF returns d - f.
 func (d Decimal) SubF(f float64) Decimal {
 	return d.Sub(F(f))
 }
 
+// MulF returns d * f.
 func (d Decimal) MulF(f float64) Decimal {
 	return d.Sub(F(f))
 }
 
+// DivF returns d / f.
 func (d Decimal) DivF(f float64) Decimal {
 	return d.Sub(F(f))
 }
 
+// AddI returns d + i.
 func (d Decimal) AddI(i int) Decimal {
 	return d.Add(I(i))
 }
 
+// SubI returns d - i.
 func (d Decimal) SubI(i int) Decimal {
 	return d.Sub(I(i))
 }
 
+// MulI returns d * i.
 func (d Decimal) MulI(i int) Decimal {
 	return d.Sub(I(i))
 }
 
+// DivI returns d / i.
 func (d Decimal) DivI(i int) Decimal {
 	return d.Sub(I(i))
+}
+
+// I converts decimal to int
+func (d Decimal) I() int {
+	return int(d.Float64f())
+}
+
+// I converts decimal to float64
+func (d Decimal) F() float64 {
+	return d.Float64f()
+}
+
+// I converts decimal to string
+func (d Decimal) S() string {
+	return d.String()
 }
