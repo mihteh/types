@@ -98,6 +98,11 @@ func F(value float64) Decimal {
 	return NewFromFloat(value)
 }
 
+// I is a convenience function for NewFromFloat() on integer
+func I(value int) Decimal {
+	return NewFromFloat(float64(value))
+}
+
 // P returns a pointer to d
 func (d Decimal) P() *Decimal {
 	return &d
@@ -711,4 +716,36 @@ func (d Decimal) Neg() Decimal {
 // Copy copies d and returns the copy
 func (d Decimal) Copy() Decimal {
 	return d.Add(Zero)
+}
+
+func (d Decimal) AddF(f float64) Decimal {
+	return d.Add(F(f))
+}
+
+func (d Decimal) SubF(f float64) Decimal {
+	return d.Sub(F(f))
+}
+
+func (d Decimal) MulF(f float64) Decimal {
+	return d.Sub(F(f))
+}
+
+func (d Decimal) DivF(f float64) Decimal {
+	return d.Sub(F(f))
+}
+
+func (d Decimal) AddI(i int) Decimal {
+	return d.Add(I(i))
+}
+
+func (d Decimal) SubI(i int) Decimal {
+	return d.Sub(I(i))
+}
+
+func (d Decimal) MulI(i int) Decimal {
+	return d.Sub(I(i))
+}
+
+func (d Decimal) DivI(i int) Decimal {
+	return d.Sub(I(i))
 }
