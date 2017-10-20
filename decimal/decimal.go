@@ -85,8 +85,8 @@ func New(value int64, exp int32) Decimal {
 }
 
 // N is a convenience function for NewFromString(), it panics if value is invalid
-func N(value string) Decimal {
-	d, err := NewFromString(value)
+func N(s string) Decimal {
+	d, err := NewFromString(s)
 	if err != nil {
 		panic(err)
 	}
@@ -94,13 +94,13 @@ func N(value string) Decimal {
 }
 
 // F is a convenience function for NewFromFloat()
-func F(value float64) Decimal {
-	return NewFromFloat(value)
+func F(f float64) Decimal {
+	return NewFromFloat(f)
 }
 
 // I is a convenience function for NewFromFloat() on integer
-func I(value int) Decimal {
-	return NewFromFloat(float64(value))
+func I(i int) Decimal {
+	return NewFromFloat(float64(i))
 }
 
 // P returns a pointer to d
