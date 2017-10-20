@@ -730,12 +730,12 @@ func (d Decimal) SubF(f float64) Decimal {
 
 // MulF returns d * f.
 func (d Decimal) MulF(f float64) Decimal {
-	return d.Sub(F(f))
+	return d.Mul(F(f))
 }
 
 // DivF returns d / f.
 func (d Decimal) DivF(f float64) Decimal {
-	return d.Sub(F(f))
+	return d.Div(F(f))
 }
 
 // AddI returns d + i.
@@ -750,12 +750,12 @@ func (d Decimal) SubI(i int) Decimal {
 
 // MulI returns d * i.
 func (d Decimal) MulI(i int) Decimal {
-	return d.Sub(I(i))
+	return d.Mul(I(i))
 }
 
 // DivI returns d / i.
 func (d Decimal) DivI(i int) Decimal {
-	return d.Sub(I(i))
+	return d.Div(I(i))
 }
 
 // I converts decimal to int
