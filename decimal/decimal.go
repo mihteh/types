@@ -85,8 +85,8 @@ func New(value int64, exp int32) Decimal {
 }
 
 // N is a convenience function for NewFromString(), it panics if value is invalid
-func N(value string) Decimal {
-	d, err := NewFromString(value)
+func N(s string) Decimal {
+	d, err := NewFromString(s)
 	if err != nil {
 		panic(err)
 	}
@@ -94,13 +94,13 @@ func N(value string) Decimal {
 }
 
 // F is a convenience function for NewFromFloat()
-func F(value float64) Decimal {
-	return NewFromFloat(value)
+func F(f float64) Decimal {
+	return NewFromFloat(f)
 }
 
 // I is a convenience function for NewFromFloat() on integer
-func I(value int) Decimal {
-	return NewFromFloat(float64(value))
+func I(i int) Decimal {
+	return NewFromFloat(float64(i))
 }
 
 // P returns a pointer to d
@@ -730,12 +730,12 @@ func (d Decimal) SubF(f float64) Decimal {
 
 // MulF returns d * f, where d is Decimal, f is float64
 func (d Decimal) MulF(f float64) Decimal {
-	return d.Sub(F(f))
+	return d.Mul(F(f))
 }
 
 // DivF returns d / f, where d is Decimal, f is float64
 func (d Decimal) DivF(f float64) Decimal {
-	return d.Sub(F(f))
+	return d.Div(F(f))
 }
 
 // AddI returns d + i, where d is Decimal, i is int
@@ -750,12 +750,12 @@ func (d Decimal) SubI(i int) Decimal {
 
 // MulI returns d * i, where d is Decimal, i is int
 func (d Decimal) MulI(i int) Decimal {
-	return d.Sub(I(i))
+	return d.Mul(I(i))
 }
 
 // DivI returns d / i, where d is Decimal, i is int
 func (d Decimal) DivI(i int) Decimal {
-	return d.Sub(I(i))
+	return d.Div(I(i))
 }
 
 // I converts decimal to int
