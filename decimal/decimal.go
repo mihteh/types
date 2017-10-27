@@ -100,7 +100,7 @@ func F(f float64) Decimal {
 
 // I is a convenience function for NewFromFloat() on integer
 func I(i int) Decimal {
-	return NewFromFloat(float64(i))
+	return N(fmt.Sprintf("%d", i))
 }
 
 // P returns a pointer to d
