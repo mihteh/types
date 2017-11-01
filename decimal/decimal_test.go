@@ -69,7 +69,7 @@ func init() {
 		if err != nil {
 			panic(err)
 		}
-		testTableForMarshal[f] = dec.StringFixed(2)
+		testTableForMarshal[f] = dec.StringFixed(6)
 	}
 }
 
@@ -219,9 +219,9 @@ func TestJSON(t *testing.T) {
 
 		if err != nil {
 			t.Errorf("error unmarshaling %s: %v", docStr, err)
-		} else if doc.Amount.StringFixed(2) != s {
+		} else if doc.Amount.StringFixed(stringPrecision) != s {
 			t.Errorf("expected %s, got %s (%s, %d)",
-				s, doc.Amount.StringFixed(2),
+				s, doc.Amount.StringFixed(stringPrecision),
 				doc.Amount.value.String(), doc.Amount.exp)
 		}
 
@@ -263,9 +263,9 @@ func TestXML(t *testing.T) {
 		err := xml.Unmarshal([]byte(docStr), &doc)
 		if err != nil {
 			t.Errorf("error unmarshaling %s: %v", docStr, err)
-		} else if doc.Amount.StringFixed(2) != s {
+		} else if doc.Amount.StringFixed(stringPrecision) != s {
 			t.Errorf("expected %s, got %s (%s, %d)",
-				s, doc.Amount.StringFixed(2),
+				s, doc.Amount.StringFixed(stringPrecision),
 				doc.Amount.value.String(), doc.Amount.exp)
 		}
 
