@@ -52,14 +52,6 @@ var oneInt = big.NewInt(1)
 var fiveInt = big.NewInt(5)
 var tenInt = big.NewInt(10)
 
-// comparePrecision is a constant for ~ comparison, it have the following default value
-var comparePrecision = NewFromFloat(0.00999999999)
-
-// SetComparePrecision sets the compare precision
-func SetComparePrecision(precision float64) {
-	comparePrecision = NewFromFloat(precision)
-}
-
 // Decimal represents a fixed-point decimal. It is immutable.
 // number = value * 10 ^ exp
 type Decimal struct {
@@ -670,34 +662,34 @@ func unquoteIfQuoted(value interface{}) (string, error) {
 	return string(bytes), nil
 }
 
-// Gt returns true id d > d2 with precision comparePrecision
+// Gt returns true id d > d2
 func (d Decimal) Gt(d2 Decimal) bool {
-	return d.Sub(d2).Cmp(comparePrecision) == 1
+	return d.Cmp(d2) > 0
 }
 
-// Ge returns true id d >= d2 with precision comparePrecision
+// Ge returns true id d >= d2
 func (d Decimal) Ge(d2 Decimal) bool {
-	return d.Gt(d2) || d.Eq(d2)
+	return d.Cmp(d2) >= 0
 }
 
-// Lt returns true id d < d2 with precision comparePrecision
+// Lt returns true id d < d2
 func (d Decimal) Lt(d2 Decimal) bool {
-	return d2.Sub(d).Cmp(comparePrecision) == 1
+	return d.Cmp(d2) < 0
 }
 
-// Eq returns true id d == d2 with precision comparePrecision
+// Eq returns true id d == d2
 func (d Decimal) Eq(d2 Decimal) bool {
-	return d.Sub(d2).Abs().Cmp(comparePrecision) == -1
+	return d.Cmp(d2) == 0
 }
 
-// Ne returns true id d != d2 with precision comparePrecision
+// Ne returns true id d != d2
 func (d Decimal) Ne(d2 Decimal) bool {
-	return !d.Eq(d2)
+	return d.Cmp(d2) != 0
 }
 
-// Le returns true id d <= d2 with precision comparePrecision
+// Le returns true id d <= d2
 func (d Decimal) Le(d2 Decimal) bool {
-	return d.Lt(d2) || d.Eq(d2)
+	return d.Cmp(d2) <= 0
 }
 
 // Neg returns -d
