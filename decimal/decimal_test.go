@@ -69,7 +69,7 @@ func init() {
 		if err != nil {
 			panic(err)
 		}
-		testTableForMarshal[f] = dec.StringFixed(2)
+		testTableForMarshal[f] = dec.String()
 	}
 }
 
@@ -219,9 +219,9 @@ func TestJSON(t *testing.T) {
 
 		if err != nil {
 			t.Errorf("error unmarshaling %s: %v", docStr, err)
-		} else if doc.Amount.StringFixed(2) != s {
+		} else if doc.Amount.String() != s {
 			t.Errorf("expected %s, got %s (%s, %d)",
-				s, doc.Amount.StringFixed(2),
+				s, doc.Amount.String(),
 				doc.Amount.value.String(), doc.Amount.exp)
 		}
 
@@ -263,9 +263,9 @@ func TestXML(t *testing.T) {
 		err := xml.Unmarshal([]byte(docStr), &doc)
 		if err != nil {
 			t.Errorf("error unmarshaling %s: %v", docStr, err)
-		} else if doc.Amount.StringFixed(2) != s {
+		} else if doc.Amount.String() != s {
 			t.Errorf("expected %s, got %s (%s, %d)",
-				s, doc.Amount.StringFixed(2),
+				s, doc.Amount.String(),
 				doc.Amount.value.String(), doc.Amount.exp)
 		}
 
@@ -918,13 +918,13 @@ func TestDecimal_Gt(t *testing.T) {
 		inp3{NewFromFloat(2.000), NewFromFloat(2.000)}:   false,
 		inp3{NewFromFloat(2.010), NewFromFloat(2.000)}:   true,
 		inp3{NewFromFloat(2.000), NewFromFloat(2.010)}:   false,
-		inp3{NewFromFloat(2.001), NewFromFloat(2.000)}:   false,
+		inp3{NewFromFloat(2.001), NewFromFloat(2.000)}:   true,
 		inp3{NewFromFloat(0.000), NewFromFloat(0.000)}:   false,
 		inp3{NewFromFloat(0.005), NewFromFloat(-0.005)}:  true,
 		inp3{NewFromFloat(-2.000), NewFromFloat(-2.000)}: false,
 		inp3{NewFromFloat(-2.010), NewFromFloat(-2.000)}: false,
 		inp3{NewFromFloat(-2.000), NewFromFloat(-2.010)}: true,
-		inp3{NewFromFloat(-2.000), NewFromFloat(-2.001)}: false,
+		inp3{NewFromFloat(-2.000), NewFromFloat(-2.001)}: true,
 		inp3{NewFromFloat(-0.000), NewFromFloat(-0.000)}: false,
 		inp3{NewFromFloat(-0.005), NewFromFloat(0.005)}:  false,
 	}
@@ -990,13 +990,13 @@ func TestDecimal_Le(t *testing.T) {
 		inp3{NewFromFloat(2.000), NewFromFloat(2.000)}:   true,
 		inp3{NewFromFloat(2.010), NewFromFloat(2.000)}:   false,
 		inp3{NewFromFloat(2.000), NewFromFloat(2.010)}:   true,
-		inp3{NewFromFloat(2.001), NewFromFloat(2.000)}:   true,
+		inp3{NewFromFloat(2.001), NewFromFloat(2.000)}:   false,
 		inp3{NewFromFloat(0.000), NewFromFloat(0.000)}:   true,
 		inp3{NewFromFloat(0.005), NewFromFloat(-0.005)}:  false,
 		inp3{NewFromFloat(-2.000), NewFromFloat(-2.000)}: true,
 		inp3{NewFromFloat(-2.010), NewFromFloat(-2.000)}: true,
 		inp3{NewFromFloat(-2.000), NewFromFloat(-2.010)}: false,
-		inp3{NewFromFloat(-2.000), NewFromFloat(-2.001)}: true,
+		inp3{NewFromFloat(-2.000), NewFromFloat(-2.001)}: false,
 		inp3{NewFromFloat(-0.000), NewFromFloat(-0.000)}: true,
 		inp3{NewFromFloat(-0.005), NewFromFloat(0.005)}:  true,
 	}
@@ -1014,13 +1014,13 @@ func TestDecimal_Eq(t *testing.T) {
 		inp3{NewFromFloat(2.000), NewFromFloat(2.000)}:   true,
 		inp3{NewFromFloat(2.010), NewFromFloat(2.000)}:   false,
 		inp3{NewFromFloat(2.000), NewFromFloat(2.010)}:   false,
-		inp3{NewFromFloat(2.001), NewFromFloat(2.000)}:   true,
+		inp3{NewFromFloat(2.001), NewFromFloat(2.000)}:   false,
 		inp3{NewFromFloat(0.000), NewFromFloat(0.000)}:   true,
 		inp3{NewFromFloat(0.005), NewFromFloat(-0.005)}:  false,
 		inp3{NewFromFloat(-2.000), NewFromFloat(-2.000)}: true,
 		inp3{NewFromFloat(-2.010), NewFromFloat(-2.000)}: false,
 		inp3{NewFromFloat(-2.000), NewFromFloat(-2.010)}: false,
-		inp3{NewFromFloat(-2.000), NewFromFloat(-2.001)}: true,
+		inp3{NewFromFloat(-2.000), NewFromFloat(-2.001)}: false,
 		inp3{NewFromFloat(-0.000), NewFromFloat(-0.000)}: true,
 		inp3{NewFromFloat(-0.005), NewFromFloat(0.005)}:  false,
 	}

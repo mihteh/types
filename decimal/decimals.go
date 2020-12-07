@@ -22,9 +22,8 @@ func (decimals Decimals) Copy() Decimals {
 
 // Equal compares two slices, decimals and decimals2, of Decimal
 // if ordered is true, comparing order also, otherwise order may differ
-// if precise is true, compare according comparePrecision
 // if slices are equal according to parameter conditions, it returns true, otherwise returns false
-func (decimals Decimals) Equal(decimals2 Decimals, ordered bool, precise bool) bool {
+func (decimals Decimals) Equal(decimals2 Decimals, ordered bool) bool {
 	if len(decimals) != len(decimals2) {
 		return false
 	}
@@ -36,14 +35,8 @@ func (decimals Decimals) Equal(decimals2 Decimals, ordered bool, precise bool) b
 	}
 
 	for i, _ := range copy1 {
-		if precise {
-			if copy1[i].Cmp(copy2[i]) != 0 {
-				return false
-			}
-		} else {
-			if copy1[i].Ne(copy2[i]) {
-				return false
-			}
+		if copy1[i].Ne(copy2[i]) {
+			return false
 		}
 	}
 

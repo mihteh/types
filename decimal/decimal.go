@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"reflect"
 	"strconv"
 	"strings"
 )
@@ -43,9 +44,6 @@ import (
 //
 var DivisionPrecision = 16
 
-// stringPrecision is the number of decimal places in string result for Marshaler interfaces
-var stringPrecision int32 = 2
-
 // Zero constant, to make computations faster.
 var Zero = New(0, 1)
 
@@ -53,14 +51,6 @@ var zeroInt = big.NewInt(0)
 var oneInt = big.NewInt(1)
 var fiveInt = big.NewInt(5)
 var tenInt = big.NewInt(10)
-
-// comparePrecision is a constant for ~ comparison, it have the following default value
-var comparePrecision = NewFromFloat(0.00999999999)
-
-// SetComparePrecision sets the compare precision
-func SetComparePrecision(precision float64) {
-	comparePrecision = NewFromFloat(precision)
-}
 
 // Decimal represents a fixed-point decimal. It is immutable.
 // number = value * 10 ^ exp
@@ -84,8 +74,8 @@ func New(value int64, exp int32) Decimal {
 }
 
 // N is a convenience function for NewFromString(), it panics if value is invalid
-func N(value string) Decimal {
-	d, err := NewFromString(value)
+func N(s string) Decimal {
+	d, err := NewFromString(s)
 	if err != nil {
 		panic(err)
 	}
@@ -93,18 +83,18 @@ func N(value string) Decimal {
 }
 
 // F is a convenience function for NewFromFloat()
-func F(value float64) Decimal {
-	return NewFromFloat(value)
+func F(f float64) Decimal {
+	return NewFromFloat(f)
+}
+
+// I is a convenience function for NewFromFloat() on integer
+func I(i int) Decimal {
+	return N(fmt.Sprintf("%d", i))
 }
 
 // P returns a pointer to d
 func (d Decimal) P() *Decimal {
 	return &d
-}
-
-// SetStringPrecision sets the precision for string output in Marshaler interfaces
-func SetStringPrecision(value int32) {
-	stringPrecision = value
 }
 
 // NewFromString returns a new Decimal from a string representation.
@@ -504,17 +494,27 @@ func (d *Decimal) UnmarshalJSON(decimalBytes []byte) error {
 
 // MarshalJSON implements the json.Marshaler interface.
 func (d Decimal) MarshalJSON() ([]byte, error) {
-	return []byte(d.StringFixed(stringPrecision)), nil
+	return []byte(d.String()), nil
 }
 
 // Scan implements the sql.Scanner interface for database deserialization.
 func (d *Decimal) Scan(value interface{}) error {
-	str, err := unquoteIfQuoted(value)
-	if err != nil {
-		return err
+	kind := reflect.TypeOf(value).Kind()
+	var err error
+	switch kind {
+	case reflect.Int64:
+		*d, err = NewFromString(fmt.Sprintf("%d", value.(int64)))
+	case reflect.Float64:
+		*d = NewFromFloat(value.(float64))
+	case reflect.Slice:
+		str, err := unquoteIfQuoted(value)
+		if err != nil {
+			return err
+		}
+		*d, err = NewFromString(str)
+	default:
+		return fmt.Errorf("Decimal.Scan(): invalid value Kind(): %s", kind)
 	}
-	*d, err = NewFromString(str)
-
 	return err
 }
 
@@ -539,8 +539,8 @@ func (d *Decimal) UnmarshalText(text []byte) error {
 
 // MarshalText implements the encoding.TextMarshaler interface for XML
 // serialization.
-func (d Decimal) MarshalText() (text []byte, err error) {
-	return []byte(d.StringFixed(stringPrecision)), nil
+func (d Decimal) MarshalText() ([]byte, error) {
+	return []byte(d.String()), nil
 }
 
 // NOTE: buggy, unintuitive, and DEPRECATED! Use StringFixed instead.
@@ -662,34 +662,34 @@ func unquoteIfQuoted(value interface{}) (string, error) {
 	return string(bytes), nil
 }
 
-// Gt returns true id d > d2 with precision comparePrecision
+// Gt returns true id d > d2
 func (d Decimal) Gt(d2 Decimal) bool {
-	return d.Sub(d2).Cmp(comparePrecision) == 1
+	return d.Cmp(d2) > 0
 }
 
-// Ge returns true id d >= d2 with precision comparePrecision
+// Ge returns true id d >= d2
 func (d Decimal) Ge(d2 Decimal) bool {
-	return d.Gt(d2) || d.Eq(d2)
+	return d.Cmp(d2) >= 0
 }
 
-// Lt returns true id d < d2 with precision comparePrecision
+// Lt returns true id d < d2
 func (d Decimal) Lt(d2 Decimal) bool {
-	return d2.Sub(d).Cmp(comparePrecision) == 1
+	return d.Cmp(d2) < 0
 }
 
-// Eq returns true id d == d2 with precision comparePrecision
+// Eq returns true id d == d2
 func (d Decimal) Eq(d2 Decimal) bool {
-	return d.Sub(d2).Abs().Cmp(comparePrecision) == -1
+	return d.Cmp(d2) == 0
 }
 
-// Ne returns true id d != d2 with precision comparePrecision
+// Ne returns true id d != d2
 func (d Decimal) Ne(d2 Decimal) bool {
-	return !d.Eq(d2)
+	return d.Cmp(d2) != 0
 }
 
-// Le returns true id d <= d2 with precision comparePrecision
+// Le returns true id d <= d2
 func (d Decimal) Le(d2 Decimal) bool {
-	return d.Lt(d2) || d.Eq(d2)
+	return d.Cmp(d2) <= 0
 }
 
 // Neg returns -d
@@ -700,4 +700,59 @@ func (d Decimal) Neg() Decimal {
 // Copy copies d and returns the copy
 func (d Decimal) Copy() Decimal {
 	return d.Add(Zero)
+}
+
+// AddF returns d + f, where d is Decimal, f is float64
+func (d Decimal) AddF(f float64) Decimal {
+	return d.Add(F(f))
+}
+
+// SubF returns d - f, where d is Decimal, f is float64
+func (d Decimal) SubF(f float64) Decimal {
+	return d.Sub(F(f))
+}
+
+// MulF returns d * f, where d is Decimal, f is float64
+func (d Decimal) MulF(f float64) Decimal {
+	return d.Mul(F(f))
+}
+
+// DivF returns d / f, where d is Decimal, f is float64
+func (d Decimal) DivF(f float64) Decimal {
+	return d.Div(F(f))
+}
+
+// AddI returns d + i, where d is Decimal, i is int
+func (d Decimal) AddI(i int) Decimal {
+	return d.Add(I(i))
+}
+
+// SubI returns d - i, where d is Decimal, i is int
+func (d Decimal) SubI(i int) Decimal {
+	return d.Sub(I(i))
+}
+
+// MulI returns d * i, where d is Decimal, i is int
+func (d Decimal) MulI(i int) Decimal {
+	return d.Mul(I(i))
+}
+
+// DivI returns d / i, where d is Decimal, i is int
+func (d Decimal) DivI(i int) Decimal {
+	return d.Div(I(i))
+}
+
+// I converts decimal to int
+func (d Decimal) I() int {
+	return int(d.IntPart())
+}
+
+// F converts decimal to float64
+func (d Decimal) F() float64 {
+	return d.Float64f()
+}
+
+// S converts decimal to string
+func (d Decimal) S() string {
+	return d.String()
 }
